@@ -53,7 +53,37 @@ TEST(parser_tests, parse_var_declarations)
 {
     BEGIN(
         "var x",
-        new VarDeclaration("x"));
+        new VarDeclaration(
+            {Token::Type::Identifier, "x", 1, 5}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, parse_var_declarations_with_assignment)
+{
+    BEGIN(
+        "var x = 1",
+        new VarDeclaration(
+            {Token::Type::Identifier, "x", 1, 5},
+            new SingleNode({Token::Type::Integer, "1", 1, 9})
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, parse_var_declarations_with_bin_expression)
+{
+    BEGIN(
+        "var x = 1 + 2",
+        new VarDeclaration(
+            {Token::Type::Identifier, "x", 1, 5},
+            new BinaryExpression(
+                new SingleNode({Token::Type::Integer, "1", 1, 9}),
+                new SingleNode({Token::Type::Integer, "2", 1, 13}),
+                {Token::Type::Plus, "+", 1, 11}
+            )
+        ));
     EXPECT_EQ(expected, actual);
     END();
 }

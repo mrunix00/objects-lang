@@ -29,10 +29,10 @@ bool SingleNode::operator==(const ASTNode &other) const
         token == dynamic_cast<const SingleNode &>(other).token;
 }
 
-VarDeclaration::VarDeclaration(std::string name)
+VarDeclaration::VarDeclaration(Token name)
     : name(std::move(name)), initializer()
 { type = Type::VarDeclaration; }
-VarDeclaration::VarDeclaration(std::string name, ASTNode *initializer)
+VarDeclaration::VarDeclaration(Token name, ASTNode *initializer)
     : name(std::move(name)), initializer(initializer)
 { type = Type::VarDeclaration; }
 VarDeclaration::~VarDeclaration()
@@ -45,7 +45,11 @@ bool VarDeclaration::operator==(const ASTNode &other) const
     if (type != other.type)
         return false;
     auto &decl = dynamic_cast<const VarDeclaration &>(other);
-    return name == decl.name && initializer == decl.initializer;
+    if (initializer.has_value() != decl.initializer.has_value())
+        return false;
+    if (initializer.has_value() && *initializer.value() != *decl.initializer.value())
+        return false;
+    return name == decl.name;
 }
 
 BinaryExpression::BinaryExpression(ASTNode *left, ASTNode *right, Token op)

@@ -28,10 +28,6 @@ struct Token
 
     inline bool operator==(const Token &other) const
     {
-        bool type_equal = type == other.type;
-        bool value_equal = value == other.value;
-        bool line_equal = line == other.line;
-        bool column_equal = column == other.column;
         return type == other.type &&
             value == other.value &&
             line == other.line &&

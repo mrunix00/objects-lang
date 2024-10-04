@@ -32,11 +32,11 @@ public:
 
 class VarDeclaration: public ASTNode
 {
-    std::string name;
+    Token name;
     std::optional<ASTNode *> initializer;
 public:
-    explicit VarDeclaration(std::string name);
-    VarDeclaration(std::string name, ASTNode *initializer);
+    explicit VarDeclaration(Token name);
+    VarDeclaration(Token name, ASTNode *initializer);
     ~VarDeclaration() override;
     bool operator==(const ASTNode &other) const override;
 };
