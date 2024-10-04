@@ -15,7 +15,7 @@ static inline bool is_separator(char c)
     return isspace(c) || c == ',' || c == '('
         || c == ')' || c == '{' || c == '}'
         || c == '\0' || c == '=' || c == '+'
-        || c == '*' || c == '/';
+        || c == '-'|| c == '*' || c == '/';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -34,7 +34,7 @@ static inline bool is_real(const std::string &str)
 {
     try {
         size_t idx;
-        std::stod(str, &idx);
+        std::stod(str, &idx); // std::stod already supports scientific notation like 2E-12
         return idx == str.size();
     }
     catch (std::invalid_argument &e) {
@@ -61,7 +61,6 @@ Token Lexer::next()
 
     // skip whitespaces
     for (; isspace(source[position]) && position < source.size(); position++) {
-        // handle new line characters
         if (source[position] == '\n') {
             line++;
             column = 1;
@@ -108,18 +107,33 @@ Token Lexer::next()
 
     if (source[position] == '"')
         return read_string();
+
+    bool seen_exponent = false;
     do {
         token.value += source[position];
+
         if (is_integer(token.value))
             token.type = Token::Type::Integer;
         else if (is_real(token.value))
             token.type = Token::Type::Real;
         else
             token.type = classify_word(token.value);
+
+        // handle exponents
+        if ((source[position] == 'E' || source[position] == 'e') && !seen_exponent) {
+            seen_exponent = true;
+            token.value += source[++position]; // Add 'E' or 'e'
+            column++;
+
+            if (source[position + 1] == '+' || source[position + 1] == '-') {
+                token.value += source[++position]; // Add sign
+            }
+        }
+
         column++;
         position++;
     }
-    while (!is_separator(source[position]));
+    while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
 
     return token;
 }
