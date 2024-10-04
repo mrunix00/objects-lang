@@ -11,6 +11,11 @@ struct Token
         Integer,
         Real,
         String,
+        Plus,
+        Minus,
+        Asterisk,
+        Slash,
+        Equals,
     } type;
 
     std::string value;

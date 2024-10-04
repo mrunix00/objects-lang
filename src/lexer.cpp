@@ -14,7 +14,8 @@ static inline bool is_separator(char c)
 {
     return isspace(c) || c == ',' || c == '('
         || c == ')' || c == '{' || c == '}'
-        || c == '\0';
+        || c == '\0' || c == '=' || c == '+'
+        || c == '*' || c == '/';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -41,6 +42,16 @@ static inline bool is_real(const std::string &str)
     }
 }
 
+static inline Token::Type classify_word(const std::string &str)
+{
+    if (str == "=") return Token::Type::Equals;
+    if (str == "+") return Token::Type::Plus;
+    if (str == "-") return Token::Type::Minus;
+    if (str == "*") return Token::Type::Asterisk;
+    if (str == "/") return Token::Type::Slash;
+    return Token::Type::Identifier;
+}
+
 Token Lexer::next()
 {
     Token token;
@@ -54,7 +65,8 @@ Token Lexer::next()
         if (source[position] == '\n') {
             line++;
             column = 1;
-        } else {
+        }
+        else {
             column++;
         }
     }
@@ -96,16 +108,18 @@ Token Lexer::next()
 
     if (source[position] == '"')
         return read_string();
-    for (; !is_separator(source[position]); position++) {
+    do {
         token.value += source[position];
         if (is_integer(token.value))
             token.type = Token::Type::Integer;
         else if (is_real(token.value))
             token.type = Token::Type::Real;
         else
-            token.type = Token::Type::Identifier;
+            token.type = classify_word(token.value);
         column++;
+        position++;
     }
+    while (!is_separator(source[position]));
 
     return token;
 }

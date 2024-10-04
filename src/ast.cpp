@@ -3,6 +3,18 @@
 #include <utility>
 #include <cassert>
 
+bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *> &right)
+{
+    if (left.size() != right.size())
+        return false;
+    for (size_t i = 0; i < left.size(); ++i)
+    {
+        if (*left[i] != *right[i])
+            return false;
+    }
+    return true;
+}
+
 SingleNode::SingleNode(Token token)
     : token(std::move(token))
 { type = Type::SingleNode; }
@@ -37,7 +49,7 @@ bool BinaryExpression::operator==(const ASTNode &other) const
     if (type != other.type)
         return false;
     auto &expr = dynamic_cast<const BinaryExpression &>(other);
-    return left == expr.left && right == expr.right && op == expr.op;
+    return *left == *expr.left && *right == *expr.right && op == expr.op;
 }
 
 UnaryExpression::UnaryExpression(Token op, ASTNode *operand)

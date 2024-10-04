@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 #include "lexer.h"
 
 class ASTNode
@@ -16,9 +17,12 @@ public:
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
+    bool operator!=(const ASTNode &other) const {
+        return !(*this == other);
+    }
 };
 
-class SingleNode: ASTNode
+class SingleNode: public ASTNode
 {
 public:
     Token token;
@@ -26,7 +30,7 @@ public:
     bool operator==(const ASTNode &other) const override;
 };
 
-class VarDeclaration: ASTNode
+class VarDeclaration: public ASTNode
 {
     std::string name;
     std::optional<ASTNode *> initializer;
@@ -36,7 +40,7 @@ public:
     bool operator==(const ASTNode &other) const override;
 };
 
-class BinaryExpression: ASTNode
+class BinaryExpression: public ASTNode
 {
     ASTNode *left;
     ASTNode *right;
@@ -46,7 +50,7 @@ public:
     bool operator==(const ASTNode &other) const override;
 };
 
-class UnaryExpression: ASTNode
+class UnaryExpression: public ASTNode
 {
     Token op;
     ASTNode *operand;
@@ -54,3 +58,5 @@ public:
     UnaryExpression(Token op, ASTNode *operand);
     bool operator==(const ASTNode &other) const override;
 };
+
+bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *> &right);

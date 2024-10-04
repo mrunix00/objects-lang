@@ -110,3 +110,15 @@ TEST(lexer_tests, multi_line_comments) {
     };
     EXPECT_EQ(actual, expected);
 }
+
+TEST(lexer_tests, operators) {
+    auto actual = tokenize("+*/=");
+    std::vector<Token> expected = {
+        Token{Token::Type::Plus, "+", 1, 1},
+        Token{Token::Type::Asterisk, "*", 1, 2},
+        Token{Token::Type::Slash, "/", 1, 3},
+        Token{Token::Type::Equals, "=", 1, 4},
+        Token{Token::Type::EndOfFile},
+    };
+    EXPECT_EQ(actual, expected);
+}
