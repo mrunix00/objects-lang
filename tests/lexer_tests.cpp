@@ -101,7 +101,8 @@ TEST(lexer_tests, comments)
     EXPECT_EQ(actual, expected);
 }
 
-TEST(lexer_tests, multi_line_comments) {
+TEST(lexer_tests, multi_line_comments)
+{
     auto actual = tokenize("test /*\nthis is a comment\n*/lol");
     std::vector<Token> expected = {
         Token{Token::Type::Identifier, "test", 1, 1},
@@ -111,7 +112,8 @@ TEST(lexer_tests, multi_line_comments) {
     EXPECT_EQ(actual, expected);
 }
 
-TEST(lexer_tests, operators) {
+TEST(lexer_tests, operators)
+{
     auto actual = tokenize("+-*/=");
     std::vector<Token> expected = {
         Token{Token::Type::Plus, "+", 1, 1},
@@ -119,6 +121,19 @@ TEST(lexer_tests, operators) {
         Token{Token::Type::Asterisk, "*", 1, 3},
         Token{Token::Type::Slash, "/", 1, 4},
         Token{Token::Type::Equals, "=", 1, 5},
+        Token{Token::Type::EndOfFile},
+    };
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(lexer_tests, keywords)
+{
+    auto actual = tokenize("var if else while");
+    std::vector<Token> expected = {
+        Token{Token::Type::Var, "var", 1, 1},
+        Token{Token::Type::If, "if", 1, 5},
+        Token{Token::Type::Else, "else", 1, 8},
+        Token{Token::Type::While, "while", 1, 13},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);

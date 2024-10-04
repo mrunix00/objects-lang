@@ -15,7 +15,7 @@ static inline bool is_separator(char c)
     return isspace(c) || c == ',' || c == '('
         || c == ')' || c == '{' || c == '}'
         || c == '\0' || c == '=' || c == '+'
-        || c == '-'|| c == '*' || c == '/';
+        || c == '-' || c == '*' || c == '/';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -49,6 +49,10 @@ static inline Token::Type classify_word(const std::string &str)
     if (str == "-") return Token::Type::Minus;
     if (str == "*") return Token::Type::Asterisk;
     if (str == "/") return Token::Type::Slash;
+    if (str == "var") return Token::Type::Var;
+    if (str == "if") return Token::Type::If;
+    if (str == "else") return Token::Type::Else;
+    if (str == "while") return Token::Type::While;
     return Token::Type::Identifier;
 }
 
@@ -110,6 +114,9 @@ Token Lexer::next()
 
     bool seen_exponent = false;
     do {
+        if (position >= source.size())
+            break;
+
         token.value += source[position];
 
         if (is_integer(token.value))
@@ -120,7 +127,9 @@ Token Lexer::next()
             token.type = classify_word(token.value);
 
         // handle exponents
-        if ((source[position] == 'E' || source[position] == 'e') && !seen_exponent) {
+        if (isdigit(source[position - 1]) &&
+            (source[position] == 'E' || source[position] == 'e')
+            && !seen_exponent) {
             seen_exponent = true;
             token.value += source[++position]; // Add 'E' or 'e'
             column++;

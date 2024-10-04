@@ -49,3 +49,12 @@ TEST(parser_tests, parse_assignment_with_binary_expression)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, parse_var_declarations)
+{
+    BEGIN("var x", ARGS(
+        new VarDeclaration("x"),
+    ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

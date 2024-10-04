@@ -1,3 +1,4 @@
+#include <cassert>
 #include "parser.h"
 
 /**
@@ -69,13 +70,31 @@ ASTNode *parse_assignment(Lexer &lexer)
     return left;
 }
 
+ASTNode *parse_var_declaration(Lexer &lexer)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::Var);
+
+    auto name = lexer.next();
+    assert(name.type == Token::Type::Identifier);
+
+    return new VarDeclaration(name.value);
+}
+
 std::vector<ASTNode *> parse(const std::string &source)
 {
     Lexer lexer(source);
     std::vector<ASTNode *> nodes;
 
     while (lexer.peek().type != Token::Type::EndOfFile) {
-        nodes.push_back(parse_assignment(lexer));
+        switch (lexer.peek().type) {
+            case Token::Type::Var:
+                nodes.push_back(parse_var_declaration(lexer));
+                break;
+            default:
+                nodes.push_back(parse_assignment(lexer));
+                break;
+        }
     }
 
     return nodes;
