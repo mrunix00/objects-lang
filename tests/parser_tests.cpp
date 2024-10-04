@@ -10,6 +10,8 @@ TEST(parser_tests, parse_single_node)
         new SingleNode({Token::Type::Identifier, "x", 1, 1}),
     };
     EXPECT_EQ(expected, actual);
+    destroy_ast(actual);
+    destroy_ast(expected);
 }
 
 TEST(parser_tests, parse_var_assignment)
@@ -23,6 +25,8 @@ TEST(parser_tests, parse_var_assignment)
         ),
     };
     EXPECT_EQ(expected, actual);
+    destroy_ast(actual);
+    destroy_ast(expected);
 }
 
 TEST(parser_tests, parse_assignment_with_binary_expression)
@@ -40,4 +44,6 @@ TEST(parser_tests, parse_assignment_with_binary_expression)
         ),
     };
     EXPECT_EQ(expected, actual);
+    destroy_ast(actual);
+    destroy_ast(expected);
 }

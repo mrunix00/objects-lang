@@ -7,12 +7,17 @@ bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *>
 {
     if (left.size() != right.size())
         return false;
-    for (size_t i = 0; i < left.size(); ++i)
-    {
+    for (size_t i = 0; i < left.size(); ++i) {
         if (*left[i] != *right[i])
             return false;
     }
     return true;
+}
+
+void destroy_ast(std::vector<ASTNode *> &ast)
+{
+    for (auto &node: ast)
+        delete node;
 }
 
 SingleNode::SingleNode(Token token)
@@ -30,6 +35,11 @@ VarDeclaration::VarDeclaration(std::string name)
 VarDeclaration::VarDeclaration(std::string name, ASTNode *initializer)
     : name(std::move(name)), initializer(initializer)
 { type = Type::VarDeclaration; }
+VarDeclaration::~VarDeclaration()
+{
+    if (initializer.has_value())
+        delete initializer.value();
+}
 bool VarDeclaration::operator==(const ASTNode &other) const
 {
     if (type != other.type)
@@ -43,6 +53,11 @@ BinaryExpression::BinaryExpression(ASTNode *left, ASTNode *right, Token op)
 {
     type = Type::BinaryExpression;
     assert(left != nullptr && right != nullptr);
+}
+BinaryExpression::~BinaryExpression()
+{
+    delete left;
+    delete right;
 }
 bool BinaryExpression::operator==(const ASTNode &other) const
 {
@@ -58,6 +73,8 @@ UnaryExpression::UnaryExpression(Token op, ASTNode *operand)
     type = Type::UnaryExpression;
     assert(operand != nullptr);
 }
+UnaryExpression::~UnaryExpression()
+{ delete operand; }
 bool UnaryExpression::operator==(const ASTNode &other) const
 {
     if (type != other.type)

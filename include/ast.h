@@ -37,6 +37,7 @@ class VarDeclaration: public ASTNode
 public:
     explicit VarDeclaration(std::string name);
     VarDeclaration(std::string name, ASTNode *initializer);
+    ~VarDeclaration() override;
     bool operator==(const ASTNode &other) const override;
 };
 
@@ -47,6 +48,7 @@ class BinaryExpression: public ASTNode
     Token op;
 public:
     BinaryExpression(ASTNode *left, ASTNode *right, Token op);
+    ~BinaryExpression() override;
     bool operator==(const ASTNode &other) const override;
 };
 
@@ -56,7 +58,10 @@ class UnaryExpression: public ASTNode
     ASTNode *operand;
 public:
     UnaryExpression(Token op, ASTNode *operand);
+    ~UnaryExpression() override;
     bool operator==(const ASTNode &other) const override;
 };
 
 bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *> &right);
+
+void destroy_ast(std::vector<ASTNode *> &ast);
