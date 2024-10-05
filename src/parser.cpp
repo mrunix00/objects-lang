@@ -38,9 +38,7 @@ static Precedence get_precedence(const ASTNode *node)
     }
 }
 
-static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &);
-
-static ASTNode *read_var_declaration(Lexer &lexer, std::vector<ASTNode *> &nodes)
+static ASTNode *read_var_declaration(Lexer &lexer)
 {
     auto token = lexer.next();
     assert(token.type == Token::Type::Var);
@@ -56,7 +54,7 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             break;
         switch (lexer.peek().type) {
             case Token::Type::Var:
-                return read_var_declaration(lexer, nodes);
+                return read_var_declaration(lexer);
             case Token::Type::Integer:
             case Token::Type::Real:
             case Token::Type::String:
@@ -72,6 +70,7 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 nodes.pop_back();
                 auto right = read_expression(lexer, nodes);
                 if (left->type == ASTNode::Type::BinaryExpression) {
+                    // Handle operator precedence
                     if (get_precedence(left) >= get_precedence(op.type)) {
                         return new BinaryExpression(left, right, op);
                     }
@@ -84,11 +83,11 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 return new BinaryExpression(left, right, op);
             }
             default:
-                throw std::runtime_error(&"Unhandled token: "[(int) lexer.peek().type]);
+                throw std::runtime_error("Unhandled token: " +
+                    std::to_string((int) lexer.peek().type));
         }
     }
-    assert(nodes.size() == 1);
-    return nodes.back();
+    return nullptr;
 }
 
 std::vector<ASTNode *> parse(const std::string &source)
