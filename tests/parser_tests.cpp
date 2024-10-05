@@ -64,9 +64,10 @@ TEST(parser_tests, parse_var_declarations_with_assignment)
 {
     BEGIN(
         "var x = 1",
-        new VarDeclaration(
-            {Token::Type::Identifier, "x", 1, 5},
-            new SingleNode({Token::Type::Integer, "1", 1, 9})
+        new BinaryExpression(
+            new VarDeclaration({Token::Type::Identifier, "x", 1, 5}),
+            new SingleNode({Token::Type::Integer, "1", 1, 9}),
+            {Token::Type::Equals, "=", 1, 7}
         ));
     EXPECT_EQ(expected, actual);
     END();
@@ -76,13 +77,14 @@ TEST(parser_tests, parse_var_declarations_with_bin_expression)
 {
     BEGIN(
         "var x = 1 + 2",
-        new VarDeclaration(
-            {Token::Type::Identifier, "x", 1, 5},
+        new BinaryExpression(
+            new VarDeclaration({Token::Type::Identifier, "x", 1, 5}),
             new BinaryExpression(
                 new SingleNode({Token::Type::Integer, "1", 1, 9}),
                 new SingleNode({Token::Type::Integer, "2", 1, 13}),
                 {Token::Type::Plus, "+", 1, 11}
-            )
+            ),
+            {Token::Type::Equals, "=", 1, 7}
         ));
     EXPECT_EQ(expected, actual);
     END();
@@ -100,6 +102,23 @@ TEST(parser_tests, operator_precedence)
                 {Token::Type::Asterisk, "*", 1, 7}
             ),
             {Token::Type::Plus, "+", 1, 3}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, operator_precedence_2)
+{
+    BEGIN(
+        "1 * 2 + 3",
+        new BinaryExpression(
+            new BinaryExpression(
+                new SingleNode({Token::Type::Integer, "1", 1, 1}),
+                new SingleNode({Token::Type::Integer, "2", 1, 5}),
+                {Token::Type::Asterisk, "*", 1, 3}
+            ),
+            new SingleNode({Token::Type::Integer, "3", 1, 9}),
+            {Token::Type::Plus, "+", 1, 7}
         ));
     EXPECT_EQ(expected, actual);
     END();

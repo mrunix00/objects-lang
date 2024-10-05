@@ -1,59 +1,97 @@
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 #include "parser.h"
 
-static ASTNode *read_expression(Lexer &lexer);
+enum class Precedence
+{
+    Lowest = 0,
+    Equals,
+    Sum,
+    Product,
+};
 
-ASTNode *read_var_declaration(Lexer &lexer)
+static Precedence get_precedence(Token::Type type)
+{
+    switch (type) {
+        case Token::Type::Equals:
+            return Precedence::Equals;
+        case Token::Type::Plus:
+        case Token::Type::Minus:
+            return Precedence::Sum;
+        case Token::Type::Asterisk:
+        case Token::Type::Slash:
+            return Precedence::Product;
+        default:
+            return Precedence::Lowest;
+    }
+}
+
+static Precedence get_precedence(const ASTNode *node)
+{
+    if (node->type == ASTNode::Type::BinaryExpression) {
+        auto op = dynamic_cast<const BinaryExpression *>(node)->op.type;
+        return get_precedence(op);
+    }
+    else {
+        return Precedence::Lowest;
+    }
+}
+
+static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &);
+
+static ASTNode *read_var_declaration(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     auto token = lexer.next();
     assert(token.type == Token::Type::Var);
     token = lexer.next();
     assert(token.type == Token::Type::Identifier);
-
-    if (lexer.peek().type == Token::Type::Equals) {
-        lexer.next();
-        return new VarDeclaration(token, read_expression(lexer));
-    }
-    else {
-        return new VarDeclaration(token);
-    }
+    return new VarDeclaration(token);
 }
 
-static ASTNode *read_expression(Lexer &lexer)
+static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
-    std::vector<ASTNode *> node;
-
     while (true) {
         if (lexer.peek().type == Token::Type::EndOfFile)
             break;
         switch (lexer.peek().type) {
             case Token::Type::Var:
-                return read_var_declaration(lexer);
+                return read_var_declaration(lexer, nodes);
             case Token::Type::Integer:
             case Token::Type::Real:
             case Token::Type::String:
             case Token::Type::Identifier:
-                node.push_back(new SingleNode(lexer.next()));
-                break;
+                return new SingleNode(lexer.next());
             case Token::Type::Plus:
             case Token::Type::Minus:
             case Token::Type::Asterisk:
             case Token::Type::Slash:
             case Token::Type::Equals: {
                 auto op = lexer.next();
-                auto left = node.back();
-                node.pop_back();
-                auto right = read_expression(lexer);
-                node.push_back(new BinaryExpression(left, right, op));
-                break;
+                auto left = nodes.back();
+                nodes.pop_back();
+                auto right = read_expression(lexer, nodes);
+                if (left->type == ASTNode::Type::BinaryExpression) {
+                    if (get_precedence(left) >= get_precedence(op.type)) {
+                        return new BinaryExpression(left, right, op);
+                    }
+                    else {
+                        auto l_bin = dynamic_cast<BinaryExpression *>(left);
+                        return new BinaryExpression(
+                            l_bin->left,
+                            new BinaryExpression(l_bin->right, right, op),
+                            l_bin->op
+                        );
+                    }
+                }
+                return new BinaryExpression(left, right, op);
             }
             default:
                 throw std::runtime_error(&"Unhandled token: "[(int) lexer.peek().type]);
         }
     }
-    assert(node.size() == 1);
-    return node.back();
+    assert(nodes.size() == 1);
+    return nodes.back();
 }
 
 std::vector<ASTNode *> parse(const std::string &source)
@@ -62,7 +100,7 @@ std::vector<ASTNode *> parse(const std::string &source)
     std::vector<ASTNode *> nodes;
 
     while (lexer.peek().type != Token::Type::EndOfFile) {
-        nodes.push_back(read_expression(lexer));
+        nodes.push_back(read_expression(lexer, nodes));
     }
 
     return nodes;

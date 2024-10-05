@@ -33,20 +33,17 @@ public:
 class VarDeclaration: public ASTNode
 {
     Token name;
-    std::optional<ASTNode *> initializer;
 public:
     explicit VarDeclaration(Token name);
-    VarDeclaration(Token name, ASTNode *initializer);
-    ~VarDeclaration() override;
     bool operator==(const ASTNode &other) const override;
 };
 
 class BinaryExpression: public ASTNode
 {
+public:
     ASTNode *left;
     ASTNode *right;
     Token op;
-public:
     BinaryExpression(ASTNode *left, ASTNode *right, Token op);
     ~BinaryExpression() override;
     bool operator==(const ASTNode &other) const override;
