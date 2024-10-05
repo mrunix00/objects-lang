@@ -77,11 +77,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                     }
                     else {
                         auto l_bin = dynamic_cast<BinaryExpression *>(left);
-                        return new BinaryExpression(
-                            l_bin->left,
-                            new BinaryExpression(l_bin->right, right, op),
-                            l_bin->op
-                        );
+                        l_bin->right = new BinaryExpression(l_bin->right, right, op);
+                        return l_bin;
                     }
                 }
                 return new BinaryExpression(left, right, op);
