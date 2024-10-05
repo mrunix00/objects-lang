@@ -87,3 +87,20 @@ TEST(parser_tests, parse_var_declarations_with_bin_expression)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, operator_precedence)
+{
+    BEGIN(
+        "1 + 2 * 3",
+        new BinaryExpression(
+            new SingleNode({Token::Type::Integer, "1", 1, 1}),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Integer, "2", 1, 5}),
+                new SingleNode({Token::Type::Integer, "3", 1, 9}),
+                {Token::Type::Asterisk, "*", 1, 7}
+            ),
+            {Token::Type::Plus, "+", 1, 3}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
