@@ -123,3 +123,29 @@ TEST(parser_tests, operator_precedence_2)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, operator_precedence_3)
+{
+    BEGIN(
+        "x = 1 * 2 + 3 / 2",
+        new BinaryExpression(
+            new SingleNode({Token::Type::Identifier, "x", 1, 1}),
+            new BinaryExpression(
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Integer, "1", 1, 5}),
+                    new SingleNode({Token::Type::Integer, "2", 1, 9}),
+                    {Token::Type::Asterisk, "*", 1, 7}
+                ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Integer, "3", 1, 13}),
+                    new SingleNode({Token::Type::Integer, "2", 1, 17}),
+                    {Token::Type::Slash, "/", 1, 15}
+                ),
+                {Token::Type::Plus, "+", 1, 11}
+            ),
+            {Token::Type::Equals, "=", 1, 3}
+        )
+    );
+    EXPECT_EQ(expected, actual);
+    END();
+}

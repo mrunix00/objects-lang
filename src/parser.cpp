@@ -47,6 +47,24 @@ static ASTNode *read_var_declaration(Lexer &lexer)
     return new VarDeclaration(token);
 }
 
+static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &op)
+{
+    if (old->type != ASTNode::Type::BinaryExpression) {
+        return new BinaryExpression(old, new_node, op);
+    }
+    auto old_node = dynamic_cast<BinaryExpression *>(old);
+    if (get_precedence(op.type) >= get_precedence(old)) {
+        auto right =
+            old_node->right->type == ASTNode::Type::BinaryExpression ?
+            handle_precedence(old_node->right, new_node, op) :
+            new BinaryExpression(old_node->right, new_node, op);
+        return new BinaryExpression(old_node->left, right, old_node->op);
+    }
+    else {
+        return new BinaryExpression(old, new_node, op);
+    }
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -69,18 +87,7 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 auto left = nodes.back();
                 nodes.pop_back();
                 auto right = read_expression(lexer, nodes);
-                if (left->type == ASTNode::Type::BinaryExpression) {
-                    // Handle operator precedence
-                    if (get_precedence(left) >= get_precedence(op.type)) {
-                        return new BinaryExpression(left, right, op);
-                    }
-                    else {
-                        auto l_bin = dynamic_cast<BinaryExpression *>(left);
-                        l_bin->right = new BinaryExpression(l_bin->right, right, op);
-                        return l_bin;
-                    }
-                }
-                return new BinaryExpression(left, right, op);
+                return handle_precedence(left, right, op);
             }
             default:
                 throw std::runtime_error("Unhandled token: " +
