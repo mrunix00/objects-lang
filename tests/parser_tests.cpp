@@ -149,3 +149,22 @@ TEST(parser_tests, operator_precedence_3)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, parenthesis_precedence)
+{
+    BEGIN(
+        "(1 + 2) * 3",
+        new BinaryExpression(
+            new ParenthesizedExpression(
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Number, "1", 1, 2}),
+                    new SingleNode({Token::Type::Number, "2", 1, 6}),
+                    {Token::Type::Plus, "+", 1, 4}
+                )
+            ),
+            new SingleNode({Token::Type::Number, "3", 1, 11}),
+            {Token::Type::Asterisk, "*", 1, 9}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

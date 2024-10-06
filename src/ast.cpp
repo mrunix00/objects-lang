@@ -72,3 +72,21 @@ bool UnaryExpression::operator==(const ASTNode &other) const
     auto &expr = dynamic_cast<const UnaryExpression &>(other);
     return op == expr.op && operand == expr.operand;
 }
+
+ParenthesizedExpression::ParenthesizedExpression(ASTNode *expression)
+    : expression(expression)
+{
+    type = Type::ParenthesizedExpression;
+    assert(expression != nullptr);
+}
+ParenthesizedExpression::~ParenthesizedExpression()
+{
+    delete expression;
+}
+bool ParenthesizedExpression::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &expr = dynamic_cast<const ParenthesizedExpression &>(other);
+    return *expression == *expr.expression;
+}

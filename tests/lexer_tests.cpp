@@ -138,3 +138,14 @@ TEST(lexer_tests, keywords)
     };
     EXPECT_EQ(actual, expected);
 }
+
+TEST(lexer_tests, punctuation)
+{
+    auto actual = tokenize("()");
+    std::vector<Token> expected = {
+        Token{Token::Type::LeftParenthesis, "(", 1, 1},
+        Token{Token::Type::RightParenthesis, ")", 1, 2},
+        Token{Token::Type::EndOfFile},
+    };
+    EXPECT_EQ(actual, expected);
+}

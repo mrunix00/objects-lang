@@ -19,6 +19,8 @@ struct Token
         If,
         Else,
         While,
+        LeftParenthesis,
+        RightParenthesis,
     } type;
 
     std::string value;

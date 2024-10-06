@@ -13,13 +13,13 @@ public:
         SingleNode,
         VarDeclaration,
         BinaryExpression,
-        UnaryExpression
+        UnaryExpression,
+        ParenthesizedExpression
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
-    bool operator!=(const ASTNode &other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const ASTNode &other) const
+    { return !(*this == other); }
 };
 
 class SingleNode: public ASTNode
@@ -46,6 +46,15 @@ public:
     Token op;
     BinaryExpression(ASTNode *left, ASTNode *right, Token op);
     ~BinaryExpression() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+class ParenthesizedExpression: public ASTNode
+{
+public:
+    ASTNode *expression;
+    explicit ParenthesizedExpression(ASTNode *expression);
+    ~ParenthesizedExpression() override;
     bool operator==(const ASTNode &other) const override;
 };
 

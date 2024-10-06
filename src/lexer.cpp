@@ -34,7 +34,7 @@ static inline bool is_real(const std::string &str)
 {
     try {
         size_t idx;
-        std::stod(str, &idx); // std::stod already supports scientific notation like 2E-12
+        std::stod(str, &idx);
         return idx == str.size();
     }
     catch (std::invalid_argument &e) {
@@ -49,6 +49,8 @@ static inline Token::Type classify_word(const std::string &str)
     if (str == "-") return Token::Type::Minus;
     if (str == "*") return Token::Type::Asterisk;
     if (str == "/") return Token::Type::Slash;
+    if (str == "(") return Token::Type::LeftParenthesis;
+    if (str == ")") return Token::Type::RightParenthesis;
     if (str == "var") return Token::Type::Var;
     if (str == "if") return Token::Type::If;
     if (str == "else") return Token::Type::Else;
@@ -108,6 +110,24 @@ Token Lexer::next()
 
     token.column = column;
     token.line = line;
+
+    // Handle single-character tokens like '('
+    char current_char = source[position];
+    if (current_char == '(') {
+        token.type = Token::Type::LeftParenthesis;
+        token.value = "(";
+        position++;
+        column++;
+        return token;
+    }
+    if (current_char == ')') {
+        token.type = Token::Type::RightParenthesis;
+        token.value = ")";
+        position++;
+        column++;
+        return token;
+    }
+    // Add other single-character token checks here...
 
     if (source[position] == '"')
         return read_string();

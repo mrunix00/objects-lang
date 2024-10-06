@@ -9,6 +9,7 @@ enum class Precedence
     Equals,
     Sum,
     Product,
+    Parenthesis,
 };
 
 static Precedence get_precedence(Token::Type type)
@@ -29,12 +30,13 @@ static Precedence get_precedence(Token::Type type)
 
 static Precedence get_precedence(const ASTNode *node)
 {
-    if (node->type == ASTNode::Type::BinaryExpression) {
-        auto op = dynamic_cast<const BinaryExpression *>(node)->op.type;
-        return get_precedence(op);
-    }
-    else {
-        return Precedence::Lowest;
+    switch (node->type) {
+        case ASTNode::Type::BinaryExpression:
+            return get_precedence(dynamic_cast<const BinaryExpression *>(node)->op.type);
+        case ASTNode::Type::ParenthesizedExpression:
+            return Precedence::Parenthesis;
+        default:
+            return Precedence::Lowest;
     }
 }
 
@@ -65,6 +67,23 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
     }
 }
 
+static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes);
+
+static ASTNode *read_parenthesized_expression(Lexer &lexer)
+{
+    std::vector<ASTNode *> nodes;
+    auto token = lexer.next();
+    assert(token.type == Token::Type::LeftParenthesis);
+    while (lexer.peek().type != Token::Type::RightParenthesis) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        nodes.push_back(read_expression(lexer, nodes));
+    }
+    token = lexer.next();
+    assert(token.type == Token::Type::RightParenthesis);
+    assert(nodes.size() == 1);
+    return new ParenthesizedExpression(nodes.back());
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -88,6 +107,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 auto right = read_expression(lexer, nodes);
                 return handle_precedence(left, right, op);
             }
+            case Token::Type::LeftParenthesis:
+                return read_parenthesized_expression(lexer);
             default:
                 throw std::runtime_error("Unhandled token: " +
                     std::to_string((int) lexer.peek().type));
