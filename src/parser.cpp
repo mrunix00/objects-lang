@@ -73,8 +73,7 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
         switch (lexer.peek().type) {
             case Token::Type::Var:
                 return read_var_declaration(lexer);
-            case Token::Type::Integer:
-            case Token::Type::Real:
+            case Token::Type::Number:
             case Token::Type::String:
             case Token::Type::Identifier:
                 return new SingleNode(lexer.next());

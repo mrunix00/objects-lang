@@ -119,10 +119,8 @@ Token Lexer::next()
 
         token.value += source[position];
 
-        if (is_integer(token.value))
-            token.type = Token::Type::Integer;
-        else if (is_real(token.value))
-            token.type = Token::Type::Real;
+        if (is_integer(token.value) || is_real(token.value))
+            token.type = Token::Type::Number;
         else
             token.type = classify_word(token.value);
 

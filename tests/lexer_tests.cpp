@@ -38,8 +38,8 @@ TEST(lexer_tests, integers)
 {
     auto actual = tokenize("1 123");
     std::vector<Token> expected = {
-        Token{Token::Type::Integer, "1", 1, 1},
-        Token{Token::Type::Integer, "123", 1, 3},
+        Token{Token::Type::Number, "1", 1, 1},
+        Token{Token::Type::Number, "123", 1, 3},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
@@ -49,10 +49,10 @@ TEST(lexer_tests, real_numbers)
 {
     auto actual = tokenize("3.1415 -3.1E12 .1e12 2E-12");
     std::vector<Token> expected = {
-        Token{Token::Type::Real, "3.1415", 1, 1},
-        Token{Token::Type::Real, "-3.1E12", 1, 8},
-        Token{Token::Type::Real, ".1e12", 1, 16},
-        Token{Token::Type::Real, "2E-12", 1, 22},
+        Token{Token::Type::Number, "3.1415", 1, 1},
+        Token{Token::Type::Number, "-3.1E12", 1, 8},
+        Token{Token::Type::Number, ".1e12", 1, 16},
+        Token{Token::Type::Number, "2E-12", 1, 22},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
@@ -84,7 +84,7 @@ TEST(lexer_tests, multiple_lines)
     std::vector<Token> expected = {
         Token{Token::Type::Identifier, "test", 1, 1},
         Token{Token::Type::Identifier, "lol", 2, 1},
-        Token{Token::Type::Integer, "123", 3, 1},
+        Token{Token::Type::Number, "123", 3, 1},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);

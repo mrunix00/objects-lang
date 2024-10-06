@@ -8,8 +8,7 @@ struct Token
     {
         EndOfFile = 0,
         Identifier,
-        Integer,
-        Real,
+        Number,
         String,
         Plus,
         Minus,

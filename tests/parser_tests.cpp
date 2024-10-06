@@ -25,7 +25,7 @@ TEST(parser_tests, parse_var_assignment)
         "x = 1",
         new BinaryExpression(
             new SingleNode({Token::Type::Identifier, "x", 1, 1}),
-            new SingleNode({Token::Type::Integer, "1", 1, 5}),
+            new SingleNode({Token::Type::Number, "1", 1, 5}),
             {Token::Type::Equals, "=", 1, 3}
         ));
     EXPECT_EQ(expected, actual);
@@ -39,8 +39,8 @@ TEST(parser_tests, parse_assignment_with_binary_expression)
         new BinaryExpression(
             new SingleNode({Token::Type::Identifier, "x", 1, 1}),
             new BinaryExpression(
-                new SingleNode({Token::Type::Integer, "1", 1, 5}),
-                new SingleNode({Token::Type::Integer, "2", 1, 9}),
+                new SingleNode({Token::Type::Number, "1", 1, 5}),
+                new SingleNode({Token::Type::Number, "2", 1, 9}),
                 {Token::Type::Plus, "+", 1, 7}
             ),
             {Token::Type::Equals, "=", 1, 3}
@@ -66,7 +66,7 @@ TEST(parser_tests, parse_var_declarations_with_assignment)
         "var x = 1",
         new BinaryExpression(
             new VarDeclaration({Token::Type::Identifier, "x", 1, 5}),
-            new SingleNode({Token::Type::Integer, "1", 1, 9}),
+            new SingleNode({Token::Type::Number, "1", 1, 9}),
             {Token::Type::Equals, "=", 1, 7}
         ));
     EXPECT_EQ(expected, actual);
@@ -80,8 +80,8 @@ TEST(parser_tests, parse_var_declarations_with_bin_expression)
         new BinaryExpression(
             new VarDeclaration({Token::Type::Identifier, "x", 1, 5}),
             new BinaryExpression(
-                new SingleNode({Token::Type::Integer, "1", 1, 9}),
-                new SingleNode({Token::Type::Integer, "2", 1, 13}),
+                new SingleNode({Token::Type::Number, "1", 1, 9}),
+                new SingleNode({Token::Type::Number, "2", 1, 13}),
                 {Token::Type::Plus, "+", 1, 11}
             ),
             {Token::Type::Equals, "=", 1, 7}
@@ -95,10 +95,10 @@ TEST(parser_tests, operator_precedence)
     BEGIN(
         "1 + 2 * 3",
         new BinaryExpression(
-            new SingleNode({Token::Type::Integer, "1", 1, 1}),
+            new SingleNode({Token::Type::Number, "1", 1, 1}),
             new BinaryExpression(
-                new SingleNode({Token::Type::Integer, "2", 1, 5}),
-                new SingleNode({Token::Type::Integer, "3", 1, 9}),
+                new SingleNode({Token::Type::Number, "2", 1, 5}),
+                new SingleNode({Token::Type::Number, "3", 1, 9}),
                 {Token::Type::Asterisk, "*", 1, 7}
             ),
             {Token::Type::Plus, "+", 1, 3}
@@ -113,11 +113,11 @@ TEST(parser_tests, operator_precedence_2)
         "1 * 2 + 3",
         new BinaryExpression(
             new BinaryExpression(
-                new SingleNode({Token::Type::Integer, "1", 1, 1}),
-                new SingleNode({Token::Type::Integer, "2", 1, 5}),
+                new SingleNode({Token::Type::Number, "1", 1, 1}),
+                new SingleNode({Token::Type::Number, "2", 1, 5}),
                 {Token::Type::Asterisk, "*", 1, 3}
             ),
-            new SingleNode({Token::Type::Integer, "3", 1, 9}),
+            new SingleNode({Token::Type::Number, "3", 1, 9}),
             {Token::Type::Plus, "+", 1, 7}
         ));
     EXPECT_EQ(expected, actual);
@@ -132,13 +132,13 @@ TEST(parser_tests, operator_precedence_3)
             new SingleNode({Token::Type::Identifier, "x", 1, 1}),
             new BinaryExpression(
                 new BinaryExpression(
-                    new SingleNode({Token::Type::Integer, "1", 1, 5}),
-                    new SingleNode({Token::Type::Integer, "2", 1, 9}),
+                    new SingleNode({Token::Type::Number, "1", 1, 5}),
+                    new SingleNode({Token::Type::Number, "2", 1, 9}),
                     {Token::Type::Asterisk, "*", 1, 7}
                 ),
                 new BinaryExpression(
-                    new SingleNode({Token::Type::Integer, "3", 1, 13}),
-                    new SingleNode({Token::Type::Integer, "2", 1, 17}),
+                    new SingleNode({Token::Type::Number, "3", 1, 13}),
+                    new SingleNode({Token::Type::Number, "2", 1, 17}),
                     {Token::Type::Slash, "/", 1, 15}
                 ),
                 {Token::Type::Plus, "+", 1, 11}
