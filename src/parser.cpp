@@ -96,23 +96,22 @@ static ASTNode *read_func_declaration(Lexer &lexer)
     // read function arguments
     token = lexer.next();
     assert(token.type == Token::Type::LeftParenthesis);
-    std::vector<ASTNode *> params;
-    read_again:
-    assert(lexer.peek().type != Token::Type::EndOfFile);
-    params.push_back(read_expression(lexer, params));
-    if (lexer.peek().type == Token::Type::Comma) {
-        lexer.next(); // consume ','
-        goto read_again;
+    std::vector<ASTNode *> args;
+    while (true) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        args.push_back(read_expression(lexer, args));
+        token = lexer.next();
+        if (token.type == Token::Type::RightParenthesis)
+            break;
+        assert(token.type == Token::Type::Comma);
     }
-    token = lexer.next();
-    assert(token.type == Token::Type::RightParenthesis);
 
     // read function body
     token = lexer.peek();
     assert(token.type == Token::Type::LeftBrace);
     auto body = read_scope_block(lexer);
 
-    return new FunctionDeclaration(name, params, body);
+    return new FunctionDeclaration(name, args, body);
 }
 
 static ASTNode *read_parenthesized_expression(Lexer &lexer)
@@ -137,7 +136,7 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             break;
         if (lexer.peek().type == Token::Type::Semicolon) {
             lexer.next();
-            break;
+            return read_expression(lexer, nodes);
         }
         switch (lexer.peek().type) {
             case Token::Type::Function:
@@ -175,9 +174,7 @@ std::vector<ASTNode *> parse(const std::string &source)
     std::vector<ASTNode *> nodes;
 
     while (lexer.peek().type != Token::Type::EndOfFile) {
-        auto expr = read_expression(lexer, nodes);
-        if (expr != nullptr)
-            nodes.push_back(expr);
+        nodes.push_back(read_expression(lexer, nodes));
     }
 
     return nodes;
