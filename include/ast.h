@@ -15,7 +15,8 @@ struct ASTNode
         UnaryExpression,
         ParenthesizedExpression,
         FunctionDeclaration,
-        ScopeBlock
+        ScopeBlock,
+        IfStatement,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -79,6 +80,17 @@ struct ScopeBlock: public ASTNode
     std::vector<ASTNode *> statements;
     explicit ScopeBlock(std::vector<ASTNode *> statements);
     ~ScopeBlock() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct IfStatement: public ASTNode
+{
+    ASTNode *condition;
+    ASTNode *body;
+    std::optional<ASTNode *> else_body;
+    IfStatement(ASTNode *condition, ASTNode *body, ASTNode *else_body);
+    IfStatement(ASTNode *condition, ASTNode *body);
+    ~IfStatement() override;
     bool operator==(const ASTNode &other) const override;
 };
 

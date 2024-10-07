@@ -68,6 +68,13 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
 }
 
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes);
+static ASTNode *read_expression(Lexer &lexer)
+{
+    std::vector<ASTNode *> nodes;
+    auto val = read_expression(lexer, nodes);
+    assert(nodes.empty());
+    return val;
+}
 
 static ASTNode *read_scope_block(Lexer &lexer)
 {
@@ -129,6 +136,33 @@ static ASTNode *read_parenthesized_expression(Lexer &lexer)
     return new ParenthesizedExpression(nodes.back());
 }
 
+static ASTNode *read_if_statement(Lexer &lexer)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::If);
+
+    // read condition
+    token = lexer.next();
+    assert(token.type == Token::Type::LeftParenthesis);
+    auto condition = read_expression(lexer);
+    token = lexer.next();
+    assert(token.type == Token::Type::RightParenthesis);
+
+    // read body
+    token = lexer.peek();
+    assert(token.type == Token::Type::LeftBrace);
+    auto body = read_scope_block(lexer);
+
+    // read else clause if found
+    if (lexer.peek().type == Token::Type::Else) {
+        lexer.next(); // consume 'else' token
+        auto elseClause = read_scope_block(lexer);
+        return new IfStatement(condition, body, elseClause);
+    }
+
+    return new IfStatement(condition, body);
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -139,6 +173,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             return read_expression(lexer, nodes);
         }
         switch (lexer.peek().type) {
+            case Token::Type::If:
+                return read_if_statement(lexer);
             case Token::Type::Function:
                 return read_func_declaration(lexer);
             case Token::Type::Var:

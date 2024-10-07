@@ -228,3 +228,52 @@ TEST(parser_tests, function_declaration)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, if_statement)
+{
+    BEGIN(
+        "if (x) { x = 0 }",
+        new IfStatement(
+            new SingleNode({Token::Type::Identifier, "x", 1, 5}),
+            new ScopeBlock(
+                {
+                    new BinaryExpression(
+                        new SingleNode({Token::Type::Identifier, "x", 1, 10}),
+                        new SingleNode({Token::Type::Number, "0", 1, 14}),
+                        {Token::Type::Equals, "=", 1, 12}
+                    ),
+                }
+            )
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, if_else_statement)
+{
+    BEGIN(
+        "if (x) { x = 0 } else { x = 1 }",
+        new IfStatement(
+            new SingleNode({Token::Type::Identifier, "x", 1, 5}),
+            new ScopeBlock(
+                {
+                    new BinaryExpression(
+                        new SingleNode({Token::Type::Identifier, "x", 1, 10}),
+                        new SingleNode({Token::Type::Number, "0", 1, 14}),
+                        {Token::Type::Equals, "=", 1, 12}
+                    ),
+                }
+            ),
+            new ScopeBlock(
+                {
+                    new BinaryExpression(
+                        new SingleNode({Token::Type::Identifier, "x", 1, 25}),
+                        new SingleNode({Token::Type::Number, "1", 1, 29}),
+                        {Token::Type::Equals, "=", 1, 27}
+                    ),
+                }
+            )
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

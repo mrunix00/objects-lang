@@ -116,9 +116,7 @@ bool FunctionDeclaration::operator==(const ASTNode &other) const
 
 ScopeBlock::ScopeBlock(std::vector<ASTNode *> statements)
     : statements(std::move(statements))
-{
-    type = Type::ScopeBlock;
-}
+{ type = Type::ScopeBlock; }
 ScopeBlock::~ScopeBlock()
 {
     for (auto &statement: statements)
@@ -130,4 +128,31 @@ bool ScopeBlock::operator==(const ASTNode &other) const
         return false;
     auto &block = dynamic_cast<const ScopeBlock &>(other);
     return statements == block.statements;
+}
+
+IfStatement::IfStatement(ASTNode *condition, ASTNode *body, ASTNode *else_body)
+    : condition(condition), body(body), else_body(else_body)
+{ type = Type::IfStatement; }
+IfStatement::IfStatement(ASTNode *condition, ASTNode *body)
+    : condition(condition), body(body)
+{ type = Type::IfStatement; }
+IfStatement::~IfStatement()
+{
+    delete condition;
+    delete body;
+    if (else_body.has_value())
+        delete else_body.value();
+}
+bool IfStatement::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &if_stmt = dynamic_cast<const IfStatement &>(other);
+    if (if_stmt.else_body.has_value() != else_body.has_value())
+        return false;
+    if (if_stmt.else_body.has_value() &&
+        *if_stmt.else_body.value() != *else_body.value())
+        return false;
+    return *condition == *if_stmt.condition &&
+        *body == *if_stmt.body;
 }
