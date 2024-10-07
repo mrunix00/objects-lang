@@ -15,7 +15,8 @@ static inline bool is_separator(char c)
     return isspace(c) || c == ',' || c == '('
         || c == ')' || c == '{' || c == '}'
         || c == '\0' || c == '=' || c == '+'
-        || c == '-' || c == '*' || c == '/';
+        || c == '-' || c == '*' || c == '/'
+        || c == ';';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -44,6 +45,7 @@ static inline bool is_real(const std::string &str)
 
 static inline Token::Type classify_word(const std::string &str)
 {
+    if (str == ";") return Token::Type::Semicolon;
     if (str == "=") return Token::Type::Equals;
     if (str == "+") return Token::Type::Plus;
     if (str == "-") return Token::Type::Minus;

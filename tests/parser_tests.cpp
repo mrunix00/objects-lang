@@ -168,3 +168,39 @@ TEST(parser_tests, parenthesis_precedence)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, multiple_expressions)
+{
+    BEGIN(
+        "1 + 2; 3 + 4",
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "1", 1, 1}),
+            new SingleNode({Token::Type::Number, "2", 1, 5}),
+            {Token::Type::Plus, "+", 1, 3}
+        ),
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "3", 1, 8}),
+            new SingleNode({Token::Type::Number, "4", 1, 12}),
+            {Token::Type::Plus, "+", 1, 10}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, multiple_expressions_2)
+{
+    BEGIN(
+        "1 + 2\n3 * 4",
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "1", 1, 1}),
+            new SingleNode({Token::Type::Number, "2", 1, 5}),
+            {Token::Type::Plus, "+", 1, 3}
+        ),
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "3", 2, 1}),
+            new SingleNode({Token::Type::Number, "4", 2, 5}),
+            {Token::Type::Asterisk, "*", 2, 3}
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

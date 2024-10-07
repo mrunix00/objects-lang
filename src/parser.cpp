@@ -89,6 +89,10 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
     while (true) {
         if (lexer.peek().type == Token::Type::EndOfFile)
             break;
+        if (lexer.peek().type == Token::Type::Semicolon) {
+            lexer.next();
+            break;
+        }
         switch (lexer.peek().type) {
             case Token::Type::Var:
                 return read_var_declaration(lexer);
@@ -123,7 +127,9 @@ std::vector<ASTNode *> parse(const std::string &source)
     std::vector<ASTNode *> nodes;
 
     while (lexer.peek().type != Token::Type::EndOfFile) {
-        nodes.push_back(read_expression(lexer, nodes));
+        auto expr = read_expression(lexer, nodes);
+        if (expr != nullptr)
+            nodes.push_back(expr);
     }
 
     return nodes;

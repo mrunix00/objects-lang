@@ -21,6 +21,7 @@ struct Token
         While,
         LeftParenthesis,
         RightParenthesis,
+        Semicolon,
     } type;
 
     std::string value;
