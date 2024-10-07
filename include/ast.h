@@ -14,7 +14,9 @@ public:
         VarDeclaration,
         BinaryExpression,
         UnaryExpression,
-        ParenthesizedExpression
+        ParenthesizedExpression,
+        FunctionDeclaration,
+        ScopeBlock
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -65,6 +67,27 @@ class UnaryExpression: public ASTNode
 public:
     UnaryExpression(Token op, ASTNode *operand);
     ~UnaryExpression() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+class FunctionDeclaration: public ASTNode
+{
+    Token name;
+    std::vector<ASTNode *> args;
+    ASTNode *body;
+public:
+    FunctionDeclaration(Token name, std::vector<ASTNode *> args, ASTNode *body);
+    FunctionDeclaration(Token name, ASTNode *body);
+    ~FunctionDeclaration() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+class ScopeBlock: public ASTNode
+{
+    std::vector<ASTNode *> statements;
+public:
+    explicit ScopeBlock(std::vector<ASTNode *> statements);
+    ~ScopeBlock() override;
     bool operator==(const ASTNode &other) const override;
 };
 

@@ -128,12 +128,13 @@ TEST(lexer_tests, operators)
 
 TEST(lexer_tests, keywords)
 {
-    auto actual = tokenize("var if else while");
+    auto actual = tokenize("var if else while function");
     std::vector<Token> expected = {
         Token{Token::Type::Var, "var", 1, 1},
         Token{Token::Type::If, "if", 1, 5},
         Token{Token::Type::Else, "else", 1, 8},
         Token{Token::Type::While, "while", 1, 13},
+        Token{Token::Type::Function, "function", 1, 19},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
@@ -141,11 +142,14 @@ TEST(lexer_tests, keywords)
 
 TEST(lexer_tests, punctuation)
 {
-    auto actual = tokenize("();");
+    auto actual = tokenize("();{},");
     std::vector<Token> expected = {
         Token{Token::Type::LeftParenthesis, "(", 1, 1},
         Token{Token::Type::RightParenthesis, ")", 1, 2},
         Token{Token::Type::Semicolon, ";", 1, 3},
+        Token{Token::Type::LeftBrace, "{", 1, 4},
+        Token{Token::Type::RightBrace, "}", 1, 5},
+        Token{Token::Type::Comma, ",", 1, 6},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);

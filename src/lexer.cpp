@@ -46,6 +46,7 @@ static inline bool is_real(const std::string &str)
 static inline Token::Type classify_word(const std::string &str)
 {
     if (str == ";") return Token::Type::Semicolon;
+    if (str == ",") return Token::Type::Comma;
     if (str == "=") return Token::Type::Equals;
     if (str == "+") return Token::Type::Plus;
     if (str == "-") return Token::Type::Minus;
@@ -53,10 +54,13 @@ static inline Token::Type classify_word(const std::string &str)
     if (str == "/") return Token::Type::Slash;
     if (str == "(") return Token::Type::LeftParenthesis;
     if (str == ")") return Token::Type::RightParenthesis;
+    if (str == "{") return Token::Type::LeftBrace;
+    if (str == "}") return Token::Type::RightBrace;
     if (str == "var") return Token::Type::Var;
     if (str == "if") return Token::Type::If;
     if (str == "else") return Token::Type::Else;
     if (str == "while") return Token::Type::While;
+    if (str == "function") return Token::Type::Function;
     return Token::Type::Identifier;
 }
 

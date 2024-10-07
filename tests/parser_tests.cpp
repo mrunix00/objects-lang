@@ -204,3 +204,27 @@ TEST(parser_tests, multiple_expressions_2)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, function_declaration)
+{
+    BEGIN(
+        "function add(x, y) { x + y }",
+        new FunctionDeclaration(
+            {Token::Type::Identifier, "add", 1, 10},
+            {
+                new SingleNode({Token::Type::Identifier, "x", 1, 14}),
+                new SingleNode({Token::Type::Identifier, "y", 1, 17}),
+            },
+            new ScopeBlock(
+                {
+                    new BinaryExpression(
+                        new SingleNode({Token::Type::Identifier, "x", 1, 22}),
+                        new SingleNode({Token::Type::Identifier, "y", 1, 26}),
+                        {Token::Type::Plus, "+", 1, 24}
+                    ),
+                }
+            )
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

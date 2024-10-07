@@ -90,3 +90,50 @@ bool ParenthesizedExpression::operator==(const ASTNode &other) const
     auto &expr = dynamic_cast<const ParenthesizedExpression &>(other);
     return *expression == *expr.expression;
 }
+
+FunctionDeclaration::FunctionDeclaration(
+    Token name,
+    std::vector<ASTNode *> args,
+    ASTNode *body)
+    : name(std::move(name)), args(std::move(args)), body(body)
+{
+    type = Type::FunctionDeclaration;
+    assert(body != nullptr);
+}
+FunctionDeclaration::FunctionDeclaration(Token name, ASTNode *body)
+    : name(std::move(name)), body(body)
+{
+    type = Type::FunctionDeclaration;
+    assert(body != nullptr);
+}
+FunctionDeclaration::~FunctionDeclaration()
+{
+    delete body;
+    for (auto &arg: args)
+        delete arg;
+}
+bool FunctionDeclaration::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &func = dynamic_cast<const FunctionDeclaration &>(other);
+    return name == func.name && args == func.args && *body == *func.body;
+}
+
+ScopeBlock::ScopeBlock(std::vector<ASTNode *> statements)
+    : statements(std::move(statements))
+{
+    type = Type::ScopeBlock;
+}
+ScopeBlock::~ScopeBlock()
+{
+    for (auto &statement: statements)
+        delete statement;
+}
+bool ScopeBlock::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &block = dynamic_cast<const ScopeBlock &>(other);
+    return statements == block.statements;
+}

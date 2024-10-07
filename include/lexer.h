@@ -22,6 +22,10 @@ struct Token
         LeftParenthesis,
         RightParenthesis,
         Semicolon,
+        LeftBrace,
+        RightBrace,
+        Function,
+        Comma,
     } type;
 
     std::string value;

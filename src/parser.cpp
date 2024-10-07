@@ -69,6 +69,52 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
 
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes);
 
+static ASTNode *read_scope_block(Lexer &lexer)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::LeftBrace);
+    std::vector<ASTNode *> statements;
+    while (lexer.peek().type != Token::Type::RightBrace) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        statements.push_back(read_expression(lexer, statements));
+    }
+    token = lexer.next();
+    assert(token.type == Token::Type::RightBrace);
+    return new ScopeBlock(statements);
+}
+
+static ASTNode *read_func_declaration(Lexer &lexer)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::Function);
+
+    // read function name
+    token = lexer.next();
+    assert(token.type == Token::Type::Identifier);
+    auto name = token;
+
+    // read function arguments
+    token = lexer.next();
+    assert(token.type == Token::Type::LeftParenthesis);
+    std::vector<ASTNode *> params;
+    read_again:
+    assert(lexer.peek().type != Token::Type::EndOfFile);
+    params.push_back(read_expression(lexer, params));
+    if (lexer.peek().type == Token::Type::Comma) {
+        lexer.next(); // consume ','
+        goto read_again;
+    }
+    token = lexer.next();
+    assert(token.type == Token::Type::RightParenthesis);
+
+    // read function body
+    token = lexer.peek();
+    assert(token.type == Token::Type::LeftBrace);
+    auto body = read_scope_block(lexer);
+
+    return new FunctionDeclaration(name, params, body);
+}
+
 static ASTNode *read_parenthesized_expression(Lexer &lexer)
 {
     std::vector<ASTNode *> nodes;
@@ -94,6 +140,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             break;
         }
         switch (lexer.peek().type) {
+            case Token::Type::Function:
+                return read_func_declaration(lexer);
             case Token::Type::Var:
                 return read_var_declaration(lexer);
             case Token::Type::Number:
