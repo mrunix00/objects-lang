@@ -4,9 +4,8 @@
 #include <vector>
 #include "lexer.h"
 
-class ASTNode
+struct ASTNode
 {
-public:
     enum class Type
     {
         Invalid = 0,
@@ -24,25 +23,22 @@ public:
     { return !(*this == other); }
 };
 
-class SingleNode: public ASTNode
+struct SingleNode: public ASTNode
 {
-public:
     Token token;
     explicit SingleNode(Token);
     bool operator==(const ASTNode &other) const override;
 };
 
-class VarDeclaration: public ASTNode
+struct VarDeclaration: public ASTNode
 {
     Token name;
-public:
     explicit VarDeclaration(Token name);
     bool operator==(const ASTNode &other) const override;
 };
 
-class BinaryExpression: public ASTNode
+struct BinaryExpression: public ASTNode
 {
-public:
     ASTNode *left;
     ASTNode *right;
     Token op;
@@ -51,41 +47,36 @@ public:
     bool operator==(const ASTNode &other) const override;
 };
 
-class ParenthesizedExpression: public ASTNode
+struct ParenthesizedExpression: public ASTNode
 {
-public:
     ASTNode *expression;
     explicit ParenthesizedExpression(ASTNode *expression);
     ~ParenthesizedExpression() override;
     bool operator==(const ASTNode &other) const override;
 };
 
-class UnaryExpression: public ASTNode
+struct UnaryExpression: public ASTNode
 {
     Token op;
     ASTNode *operand;
-public:
     UnaryExpression(Token op, ASTNode *operand);
     ~UnaryExpression() override;
     bool operator==(const ASTNode &other) const override;
 };
 
-class FunctionDeclaration: public ASTNode
+struct FunctionDeclaration: public ASTNode
 {
     Token name;
     std::vector<ASTNode *> args;
     ASTNode *body;
-public:
     FunctionDeclaration(Token name, std::vector<ASTNode *> args, ASTNode *body);
-    FunctionDeclaration(Token name, ASTNode *body);
     ~FunctionDeclaration() override;
     bool operator==(const ASTNode &other) const override;
 };
 
-class ScopeBlock: public ASTNode
+struct ScopeBlock: public ASTNode
 {
     std::vector<ASTNode *> statements;
-public:
     explicit ScopeBlock(std::vector<ASTNode *> statements);
     ~ScopeBlock() override;
     bool operator==(const ASTNode &other) const override;

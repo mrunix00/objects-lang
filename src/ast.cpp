@@ -100,12 +100,6 @@ FunctionDeclaration::FunctionDeclaration(
     type = Type::FunctionDeclaration;
     assert(body != nullptr);
 }
-FunctionDeclaration::FunctionDeclaration(Token name, ASTNode *body)
-    : name(std::move(name)), body(body)
-{
-    type = Type::FunctionDeclaration;
-    assert(body != nullptr);
-}
 FunctionDeclaration::~FunctionDeclaration()
 {
     delete body;
