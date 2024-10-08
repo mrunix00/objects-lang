@@ -26,6 +26,8 @@ struct Token
         RightBrace,
         Function,
         Comma,
+        LooseEquality,
+        StrictEquality,
     } type;
 
     std::string value;

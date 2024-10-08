@@ -64,8 +64,7 @@ static inline Token::Type classify_word(const std::string &str)
     return Token::Type::Identifier;
 }
 
-Token Lexer::next()
-{
+Token Lexer::next() {
     Token token;
 
     if (position >= source.size())
@@ -76,8 +75,7 @@ Token Lexer::next()
         if (source[position] == '\n') {
             line++;
             column = 1;
-        }
-        else {
+        } else {
             column++;
         }
     }
@@ -117,8 +115,32 @@ Token Lexer::next()
     token.column = column;
     token.line = line;
 
-    // Handle single-character tokens like '('
     char current_char = source[position];
+
+    // Handle '===' and '=='
+    if (current_char == '=') {
+        if (source[position + 1] == '=') {
+            if (source[position + 2] == '=') {
+                token.type = Token::Type::StrictEquality;
+                token.value = "===";
+                position += 3;
+                column += 3;
+            } else {
+                token.type = Token::Type::LooseEquality;
+                token.value = "==";
+                position += 2;
+                column += 2;
+            }
+        } else {
+            token.type = Token::Type::Equals;
+            token.value = "=";
+            position++;
+            column++;
+        }
+        return token;
+    }
+
+    // Handle single-character tokens like '('
     if (current_char == '(') {
         token.type = Token::Type::LeftParenthesis;
         token.value = "(";
@@ -133,6 +155,7 @@ Token Lexer::next()
         column++;
         return token;
     }
+
     // Add other single-character token checks here...
 
     if (source[position] == '"')
@@ -152,8 +175,7 @@ Token Lexer::next()
 
         // handle exponents
         if (isdigit(source[position - 1]) &&
-            (source[position] == 'E' || source[position] == 'e')
-            && !seen_exponent) {
+            (source[position] == 'E' || source[position] == 'e') && !seen_exponent) {
             seen_exponent = true;
             token.value += source[++position]; // Add 'E' or 'e'
             column++;
@@ -165,8 +187,7 @@ Token Lexer::next()
 
         column++;
         position++;
-    }
-    while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
+    } while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
 
     return token;
 }
