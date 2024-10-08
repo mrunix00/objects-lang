@@ -152,6 +152,7 @@ Token Lexer::next()
         TOK(LeftBracket, '[');
         TOK(RightBracket, ']');
         default:
+            break;
     }
 
     if (source[position] == '"')
@@ -201,30 +202,18 @@ Token Lexer::peek()
     return token;
 }
 
+#define ESCAPE_SEQ(CHAR, ESC) case CHAR: token.value += ESC; break
 inline void Lexer::handle_escape_sequence(Token &token)
 {
     position++; // skip '\'
     switch (source[position]) {
-        case 'n':
-            token.value += '\n';
-            break;
-        case 'r':
-            token.value += '\r';
-            break;
-        case 't':
-            token.value += '\t';
-            break;
-        case '"':
-            token.value += '"';
-            break;
-        case '\'':
-            token.value += '\'';
-            break;
-        case '\\':
-            token.value += '\\';
-            break;
+        ESCAPE_SEQ('n', '\n');
+        ESCAPE_SEQ('r', '\r');
+        ESCAPE_SEQ('t', '\t');
+        ESCAPE_SEQ('"', '\"');
+        ESCAPE_SEQ('\'', '\'');
+        ESCAPE_SEQ('\\', '\\');
         default:
-            token.value += source[position];
             break;
     }
     column++;
