@@ -156,3 +156,20 @@ bool IfStatement::operator==(const ASTNode &other) const
     return *condition == *if_stmt.condition &&
         *body == *if_stmt.body;
 }
+
+WhileStatement::WhileStatement(ASTNode *condition, ASTNode *body)
+    : condition(condition), body(body)
+{ type = Type::WhileStatement; }
+WhileStatement::~WhileStatement()
+{
+    delete condition;
+    delete body;
+}
+bool WhileStatement::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &while_stmt = dynamic_cast<const WhileStatement &>(other);
+    return *condition == *while_stmt.condition &&
+        *body == *while_stmt.body;
+}

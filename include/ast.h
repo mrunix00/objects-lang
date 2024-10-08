@@ -17,6 +17,7 @@ struct ASTNode
         FunctionDeclaration,
         ScopeBlock,
         IfStatement,
+        WhileStatement,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -91,6 +92,15 @@ struct IfStatement: public ASTNode
     IfStatement(ASTNode *condition, ASTNode *body, ASTNode *else_body);
     IfStatement(ASTNode *condition, ASTNode *body);
     ~IfStatement() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct WhileStatement: public ASTNode
+{
+    ASTNode *condition;
+    ASTNode *body;
+    WhileStatement(ASTNode *condition, ASTNode *body);
+    ~WhileStatement() override;
     bool operator==(const ASTNode &other) const override;
 };
 

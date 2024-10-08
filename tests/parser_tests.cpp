@@ -281,3 +281,23 @@ TEST(parser_tests, if_else_statement)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, while_statement)
+{
+    BEGIN(
+        "while (x) { x = 0 }",
+        new WhileStatement(
+            new SingleNode({Token::Type::Identifier, "x", 1, 8}),
+            new ScopeBlock(
+                {
+                    new BinaryExpression(
+                        new SingleNode({Token::Type::Identifier, "x", 1, 13}),
+                        new SingleNode({Token::Type::Number, "0", 1, 17}),
+                        {Token::Type::Equals, "=", 1, 15}
+                    ),
+                }
+            )
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

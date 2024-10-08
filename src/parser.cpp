@@ -147,7 +147,7 @@ static ASTNode *read_if_statement(Lexer &lexer)
     token = lexer.next();
     assert(token.type == Token::Type::LeftParenthesis);
     std::vector<ASTNode *> nodes;
-    while(lexer.peek().type != Token::Type::RightParenthesis) {
+    while (lexer.peek().type != Token::Type::RightParenthesis) {
         assert(lexer.peek().type != Token::Type::EndOfFile);
         nodes.push_back(read_expression(lexer, nodes));
     }
@@ -171,6 +171,32 @@ static ASTNode *read_if_statement(Lexer &lexer)
     return new IfStatement(condition, body);
 }
 
+static ASTNode *read_while_statement(Lexer &lexer)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::While);
+
+    // read condition
+    token = lexer.next();
+    assert(token.type == Token::Type::LeftParenthesis);
+    std::vector<ASTNode *> nodes;
+    while (lexer.peek().type != Token::Type::RightParenthesis) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        nodes.push_back(read_expression(lexer, nodes));
+    }
+    token = lexer.next();
+    assert(nodes.size() == 1);
+    auto condition = nodes.back();
+    assert(token.type == Token::Type::RightParenthesis);
+
+    // read body
+    token = lexer.peek();
+    assert(token.type == Token::Type::LeftBrace);
+    auto body = read_scope_block(lexer);
+
+    return new WhileStatement(condition, body);
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -183,6 +209,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
         switch (lexer.peek().type) {
             case Token::Type::If:
                 return read_if_statement(lexer);
+            case Token::Type::While:
+                return read_while_statement(lexer);
             case Token::Type::Function:
                 return read_func_declaration(lexer);
             case Token::Type::Var:
