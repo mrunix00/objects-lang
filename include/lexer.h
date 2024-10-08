@@ -24,6 +24,8 @@ struct Token
         Semicolon,
         LeftBrace,
         RightBrace,
+        LeftBracket,
+        RightBracket,
         Function,
         Comma,
         LooseEquality,

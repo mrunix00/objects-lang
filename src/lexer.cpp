@@ -16,7 +16,7 @@ static inline bool is_separator(char c)
         || c == ')' || c == '{' || c == '}'
         || c == '\0' || c == '=' || c == '+'
         || c == '-' || c == '*' || c == '/'
-        || c == ';';
+        || c == ';' || c == '[' || c == ']';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -64,7 +64,8 @@ static inline Token::Type classify_word(const std::string &str)
     return Token::Type::Identifier;
 }
 
-Token Lexer::next() {
+Token Lexer::next()
+{
     Token token;
 
     if (position >= source.size())
@@ -75,7 +76,8 @@ Token Lexer::next() {
         if (source[position] == '\n') {
             line++;
             column = 1;
-        } else {
+        }
+        else {
             column++;
         }
     }
@@ -125,13 +127,15 @@ Token Lexer::next() {
                 token.value = "===";
                 position += 3;
                 column += 3;
-            } else {
+            }
+            else {
                 token.type = Token::Type::LooseEquality;
                 token.value = "==";
                 position += 2;
                 column += 2;
             }
-        } else {
+        }
+        else {
             token.type = Token::Type::Equals;
             token.value = "=";
             position++;
@@ -141,22 +145,14 @@ Token Lexer::next() {
     }
 
     // Handle single-character tokens like '('
-    if (current_char == '(') {
-        token.type = Token::Type::LeftParenthesis;
-        token.value = "(";
-        position++;
-        column++;
-        return token;
+#define TOK(tok, c) case c: token.type = Token::Type::tok; token.value = c; position++; column++; return token
+    switch (current_char) {
+        TOK(LeftParenthesis, '(');
+        TOK(RightParenthesis, ')');
+        TOK(LeftBracket, '[');
+        TOK(RightBracket, ']');
+        default:
     }
-    if (current_char == ')') {
-        token.type = Token::Type::RightParenthesis;
-        token.value = ")";
-        position++;
-        column++;
-        return token;
-    }
-
-    // Add other single-character token checks here...
 
     if (source[position] == '"')
         return read_string();
@@ -187,7 +183,8 @@ Token Lexer::next() {
 
         column++;
         position++;
-    } while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
+    }
+    while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
 
     return token;
 }

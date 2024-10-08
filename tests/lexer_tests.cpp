@@ -144,7 +144,7 @@ TEST(lexer_tests, keywords)
 
 TEST(lexer_tests, punctuation)
 {
-    auto actual = tokenize("();{},");
+    auto actual = tokenize("();{},[]");
     std::vector<Token> expected = {
         Token{Token::Type::LeftParenthesis, "(", 1, 1},
         Token{Token::Type::RightParenthesis, ")", 1, 2},
@@ -152,6 +152,8 @@ TEST(lexer_tests, punctuation)
         Token{Token::Type::LeftBrace, "{", 1, 4},
         Token{Token::Type::RightBrace, "}", 1, 5},
         Token{Token::Type::Comma, ",", 1, 6},
+        Token{Token::Type::LeftBracket, "[", 1, 7},
+        Token{Token::Type::RightBracket, "]", 1, 8},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
