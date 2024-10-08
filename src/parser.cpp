@@ -70,13 +70,6 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
 }
 
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes);
-static ASTNode *read_expression(Lexer &lexer)
-{
-    std::vector<ASTNode *> nodes;
-    auto val = read_expression(lexer, nodes);
-    assert(nodes.empty());
-    return val;
-}
 
 static ASTNode *read_scope_block(Lexer &lexer)
 {
