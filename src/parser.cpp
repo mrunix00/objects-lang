@@ -15,6 +15,8 @@ enum class Precedence
 static Precedence get_precedence(Token::Type type)
 {
     switch (type) {
+        case Token::Type::StrictEquality:
+        case Token::Type::LooseEquality:
         case Token::Type::Equals:
             return Precedence::Equals;
         case Token::Type::Plus:
@@ -144,8 +146,14 @@ static ASTNode *read_if_statement(Lexer &lexer)
     // read condition
     token = lexer.next();
     assert(token.type == Token::Type::LeftParenthesis);
-    auto condition = read_expression(lexer);
+    std::vector<ASTNode *> nodes;
+    while(lexer.peek().type != Token::Type::RightParenthesis) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        nodes.push_back(read_expression(lexer, nodes));
+    }
     token = lexer.next();
+    assert(nodes.size() == 1);
+    auto condition = nodes.back();
     assert(token.type == Token::Type::RightParenthesis);
 
     // read body
@@ -187,7 +195,9 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             case Token::Type::Minus:
             case Token::Type::Asterisk:
             case Token::Type::Slash:
-            case Token::Type::Equals: {
+            case Token::Type::Equals:
+            case Token::Type::LooseEquality:
+            case Token::Type::StrictEquality: {
                 auto op = lexer.next();
                 auto left = nodes.back();
                 nodes.pop_back();

@@ -232,15 +232,19 @@ TEST(parser_tests, function_declaration)
 TEST(parser_tests, if_statement)
 {
     BEGIN(
-        "if (x) { x = 0 }",
+        "if (x == 0) { x = 0 }",
         new IfStatement(
-            new SingleNode({Token::Type::Identifier, "x", 1, 5}),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Identifier, "x", 1, 5}),
+                new SingleNode({Token::Type::Number, "0", 1, 10}),
+                {Token::Type::LooseEquality, "==", 1, 7}
+            ),
             new ScopeBlock(
                 {
                     new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 10}),
-                        new SingleNode({Token::Type::Number, "0", 1, 14}),
-                        {Token::Type::Equals, "=", 1, 12}
+                        new SingleNode({Token::Type::Identifier, "x", 1, 15}),
+                        new SingleNode({Token::Type::Number, "0", 1, 19}),
+                        {Token::Type::Equals, "=", 1, 17}
                     ),
                 }
             )
