@@ -30,6 +30,7 @@ struct Token
         Comma,
         LooseEquality,
         StrictEquality,
+        Dot,
     } type;
 
     std::string value;

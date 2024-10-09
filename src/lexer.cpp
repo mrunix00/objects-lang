@@ -52,10 +52,6 @@ static inline Token::Type classify_word(const std::string &str)
     if (str == "-") return Token::Type::Minus;
     if (str == "*") return Token::Type::Asterisk;
     if (str == "/") return Token::Type::Slash;
-    if (str == "(") return Token::Type::LeftParenthesis;
-    if (str == ")") return Token::Type::RightParenthesis;
-    if (str == "{") return Token::Type::LeftBrace;
-    if (str == "}") return Token::Type::RightBrace;
     if (str == "var") return Token::Type::Var;
     if (str == "if") return Token::Type::If;
     if (str == "else") return Token::Type::Else;
@@ -151,6 +147,16 @@ Token Lexer::next()
         TOK(RightParenthesis, ')');
         TOK(LeftBracket, '[');
         TOK(RightBracket, ']');
+        TOK(LeftBrace, '{');
+        TOK(RightBrace, '}');
+        case '.':
+            if (isdigit(source[position + 1]))
+                break;
+            token.type = Token::Type::Dot;
+            token.value = '.';
+            position++;
+            column++;
+            return token;
         default:
             break;
     }
