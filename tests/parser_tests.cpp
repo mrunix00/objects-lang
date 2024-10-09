@@ -313,3 +313,15 @@ TEST(parser_tests, array_accesser)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, field_accessor)
+{
+    BEGIN(
+        "x.y",
+        new FieldAccess(
+            new SingleNode({Token::Type::Identifier, "x", 1, 1}),
+            new SingleNode({Token::Type::Identifier, "y", 1, 3})
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

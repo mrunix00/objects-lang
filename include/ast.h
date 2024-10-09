@@ -19,6 +19,7 @@ struct ASTNode
         IfStatement,
         WhileStatement,
         ArrayAccess,
+        FieldAccess,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -111,6 +112,15 @@ struct ArrayAccess: public ASTNode
     ASTNode *index;
     ArrayAccess(ASTNode *array, ASTNode *index);
     ~ArrayAccess() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct FieldAccess: public ASTNode
+{
+    ASTNode *record;
+    ASTNode *field;
+    FieldAccess(ASTNode *record, ASTNode *field);
+    ~FieldAccess() override;
     bool operator==(const ASTNode &other) const override;
 };
 

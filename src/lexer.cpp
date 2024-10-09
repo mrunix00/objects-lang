@@ -16,7 +16,8 @@ static inline bool is_separator(char c)
         || c == ')' || c == '{' || c == '}'
         || c == '\0' || c == '=' || c == '+'
         || c == '-' || c == '*' || c == '/'
-        || c == ';' || c == '[' || c == ']';
+        || c == ';' || c == '[' || c == ']'
+        || c == '.';
 }
 
 static inline bool is_integer(const std::string &str)
@@ -165,7 +166,7 @@ Token Lexer::next()
         return read_string();
 
     bool seen_exponent = false;
-    do {
+    while (true) {
         if (position >= source.size())
             break;
 
@@ -190,8 +191,15 @@ Token Lexer::next()
 
         column++;
         position++;
+
+        // an ugly workaround for real numbers
+        if (token.type == Token::Type::Number &&
+            source[position] == '.')
+            continue;
+        if (is_separator(source[position]) &&
+            !(seen_exponent && (source[position] == '+' || source[position] == '-')))
+            break;
     }
-    while (!is_separator(source[position]) || (seen_exponent && (source[position] == '+' || source[position] == '-')));
 
     return token;
 }

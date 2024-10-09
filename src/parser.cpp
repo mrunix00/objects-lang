@@ -246,6 +246,13 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 auto right = read_expression(lexer, nodes);
                 return handle_precedence(left, right, op);
             }
+            case Token::Type::Dot: {
+                auto token = lexer.next(); // consume '.'
+                auto field = read_expression(lexer, nodes);
+                auto record = nodes.back();
+                nodes.pop_back();
+                return new FieldAccess(record, field);
+            }
             case Token::Type::LeftParenthesis:
                 return read_parenthesized_expression(lexer);
             case Token::Type::LeftBracket:

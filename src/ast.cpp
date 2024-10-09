@@ -190,3 +190,23 @@ bool ArrayAccess::operator==(const ASTNode &other) const
     return *array == *array_access.array &&
         *index == *array_access.index;
 }
+
+FieldAccess::FieldAccess(ASTNode *record, ASTNode *field)
+    : record(record), field(field)
+{
+    type = Type::FieldAccess;
+    assert(record != nullptr && field != nullptr);
+}
+FieldAccess::~FieldAccess()
+{
+    delete record;
+    delete field;
+}
+bool FieldAccess::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &field_access = dynamic_cast<const FieldAccess &>(other);
+    return *record == *field_access.record &&
+        *field == *field_access.field;
+}
