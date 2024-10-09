@@ -18,6 +18,7 @@ struct ASTNode
         ScopeBlock,
         IfStatement,
         WhileStatement,
+        ArrayAccess,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -101,6 +102,15 @@ struct WhileStatement: public ASTNode
     ASTNode *body;
     WhileStatement(ASTNode *condition, ASTNode *body);
     ~WhileStatement() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct ArrayAccess: public ASTNode
+{
+    ASTNode *array;
+    ASTNode *index;
+    ArrayAccess(ASTNode *array, ASTNode *index);
+    ~ArrayAccess() override;
     bool operator==(const ASTNode &other) const override;
 };
 

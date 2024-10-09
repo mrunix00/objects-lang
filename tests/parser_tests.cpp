@@ -301,3 +301,15 @@ TEST(parser_tests, while_statement)
     EXPECT_EQ(expected, actual);
     END();
 }
+
+TEST(parser_tests, array_accesser)
+{
+    BEGIN(
+        "x[0]",
+        new ArrayAccess(
+            new SingleNode({Token::Type::Identifier, "x", 1, 1}),
+            new SingleNode({Token::Type::Number, "0", 1, 3})
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}

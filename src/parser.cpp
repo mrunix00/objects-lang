@@ -190,6 +190,27 @@ static ASTNode *read_while_statement(Lexer &lexer)
     return new WhileStatement(condition, body);
 }
 
+static ASTNode *read_array_access(Lexer &lexer, std::vector<ASTNode *> &nodes)
+{
+    auto token = lexer.next();
+    assert(token.type == Token::Type::LeftBracket);
+
+    // read array index
+    std::vector<ASTNode *> index_nodes;
+    while (lexer.peek().type != Token::Type::RightBracket) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        index_nodes.push_back(read_expression(lexer, index_nodes));
+    }
+    assert(index_nodes.size() == 1);
+
+    token = lexer.next();
+    assert(token.type == Token::Type::RightBracket);
+
+    auto array = nodes.back();
+    nodes.pop_back();
+    return new ArrayAccess(array, index_nodes.back());
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -227,6 +248,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             }
             case Token::Type::LeftParenthesis:
                 return read_parenthesized_expression(lexer);
+            case Token::Type::LeftBracket:
+                return read_array_access(lexer, nodes);
             default:
                 throw std::runtime_error("Unhandled token: " +
                     std::to_string((int) lexer.peek().type));

@@ -173,3 +173,20 @@ bool WhileStatement::operator==(const ASTNode &other) const
     return *condition == *while_stmt.condition &&
         *body == *while_stmt.body;
 }
+
+ArrayAccess::ArrayAccess(ASTNode *array, ASTNode *index)
+    : array(array), index(index)
+{ type = Type::ArrayAccess; }
+ArrayAccess::~ArrayAccess()
+{
+    delete array;
+    delete index;
+}
+bool ArrayAccess::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &array_access = dynamic_cast<const ArrayAccess &>(other);
+    return *array == *array_access.array &&
+        *index == *array_access.index;
+}
