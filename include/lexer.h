@@ -53,6 +53,8 @@ class Lexer
     size_t line;
     size_t column;
 
+    Token last_token;
+
     Token read_string();
     void handle_escape_sequence(Token &);
 
@@ -60,5 +62,6 @@ public:
     explicit Lexer(std::string);
 
     Token next();
+    Token current();
     Token peek();
 };

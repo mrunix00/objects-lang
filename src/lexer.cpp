@@ -201,6 +201,7 @@ Token Lexer::next()
             break;
     }
 
+    last_token = token;
     return token;
 }
 
@@ -209,10 +210,12 @@ Token Lexer::peek()
     auto o_line = this->line;
     auto o_column = this->column;
     auto o_position = this->position;
+    auto old = current();
     auto token = next();
     this->line = o_line;
     this->column = o_column;
     this->position = o_position;
+    this->last_token = old;
     return token;
 }
 
@@ -251,4 +254,9 @@ Token Lexer::read_string()
     position++;
     column++;
     return token;
+}
+
+Token Lexer::current()
+{
+    return last_token;
 }

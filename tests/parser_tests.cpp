@@ -150,6 +150,31 @@ TEST(parser_tests, operator_precedence_3)
     END();
 }
 
+TEST(parser_tests, multiline_expression)
+{
+    BEGIN(
+        "1 + 2\n"
+        "- 3\n"
+        "2 + 3",
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "1", 1, 1}),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Number, "2", 1, 5}),
+                new SingleNode({Token::Type::Number, "3", 2, 3}),
+                {Token::Type::Minus, "-", 2, 1}
+            ),
+            {Token::Type::Plus, "+", 1, 3}
+        ),
+        new BinaryExpression(
+            new SingleNode({Token::Type::Number, "2", 3, 1}),
+            new SingleNode({Token::Type::Number, "3", 3, 5}),
+            {Token::Type::Plus, "+", 3, 3}
+        )
+    );
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
 TEST(parser_tests, parenthesis_precedence)
 {
     BEGIN(
@@ -276,6 +301,28 @@ TEST(parser_tests, if_else_statement)
                         {Token::Type::Equals, "=", 1, 27}
                     ),
                 }
+            )
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, if_statement_no_scope_block)
+{
+    BEGIN(
+        "if (x) x = 0\n"
+        "else x = 1",
+        new IfStatement(
+            new SingleNode({Token::Type::Identifier, "x", 1, 5}),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Identifier, "x", 1, 8}),
+                new SingleNode({Token::Type::Number, "0", 1, 12}),
+                {Token::Type::Equals, "=", 1, 10}
+            ),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Identifier, "x", 2, 6}),
+                new SingleNode({Token::Type::Number, "1", 2, 10}),
+                {Token::Type::Equals, "=", 2, 8}
             )
         ));
     EXPECT_EQ(expected, actual);

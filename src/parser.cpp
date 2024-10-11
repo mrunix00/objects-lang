@@ -69,7 +69,25 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
     }
 }
 
+static bool is_expression_ended(const Token &current, const Token &next)
+{
+    if (next.type == Token::Type::Semicolon ||
+        next.type == Token::Type::EndOfFile)
+        return true;
+    if (next.line > current.line)
+        return true;
+    return false;
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes);
+static ASTNode *read_expression(Lexer &lexer)
+{
+    std::vector<ASTNode *> nodes;
+    while (!is_expression_ended(lexer.current(), lexer.peek()))
+        nodes.push_back(read_expression(lexer, nodes));
+    assert(nodes.size() == 1);
+    return nodes.back();
+}
 
 static ASTNode *read_scope_block(Lexer &lexer)
 {
@@ -151,13 +169,18 @@ static ASTNode *read_if_statement(Lexer &lexer)
 
     // read body
     token = lexer.peek();
-    assert(token.type == Token::Type::LeftBrace);
-    auto body = read_scope_block(lexer);
+    ASTNode *body = token.type == Token::Type::LeftBrace ?
+                    read_scope_block(lexer) :
+                    read_expression(lexer);
 
     // read else clause if found
     if (lexer.peek().type == Token::Type::Else) {
         lexer.next(); // consume 'else' token
-        auto elseClause = read_scope_block(lexer);
+        ASTNode *elseClause;
+        if (lexer.peek().type == Token::Type::LeftBrace)
+            elseClause = read_scope_block(lexer);
+        else
+            elseClause = read_expression(lexer);
         return new IfStatement(condition, body, elseClause);
     }
 
