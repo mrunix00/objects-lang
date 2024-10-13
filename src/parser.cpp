@@ -234,6 +234,27 @@ static ASTNode *read_array_access(Lexer &lexer, std::vector<ASTNode *> &nodes)
     return new ArrayAccess(array, index_nodes.back());
 }
 
+static ASTNode *read_function_call(Lexer &lexer, std::vector<ASTNode *> &nodes)
+{
+    auto name = nodes.back();
+    assert(name->type == ASTNode::Type::SingleNode);
+    nodes.pop_back();
+
+    std::vector<ASTNode *> args;
+    auto token = lexer.next();
+    assert(token.type == Token::Type::LeftParenthesis);
+    while (lexer.peek().type != Token::Type::RightParenthesis) {
+        assert(lexer.peek().type != Token::Type::EndOfFile);
+        args.push_back(read_expression(lexer, args));
+        if (lexer.peek().type == Token::Type::Comma)
+            lexer.next();
+    }
+    token = lexer.next();
+    assert(token.type == Token::Type::RightParenthesis);
+
+    return new FunctionCall(name, args);
+}
+
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
 {
     while (true) {
@@ -277,6 +298,8 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 return new FieldAccess(record, field);
             }
             case Token::Type::LeftParenthesis:
+                if (lexer.current().type == Token::Type::Identifier)
+                    return read_function_call(lexer, nodes);
                 return read_parenthesized_expression(lexer);
             case Token::Type::LeftBracket:
                 return read_array_access(lexer, nodes);

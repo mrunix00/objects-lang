@@ -210,3 +210,20 @@ bool FieldAccess::operator==(const ASTNode &other) const
     return *record == *field_access.record &&
         *field == *field_access.field;
 }
+
+FunctionCall::FunctionCall(ASTNode *name, std::vector<ASTNode *> args)
+    : name(name), args(std::move(args))
+{ type = Type::FunctionCall; }
+FunctionCall::~FunctionCall()
+{
+    delete name;
+    for (auto &arg: args)
+        delete arg;
+}
+bool FunctionCall::operator==(const ASTNode &other) const
+{
+    if (type != other.type)
+        return false;
+    auto &func_call = dynamic_cast<const FunctionCall &>(other);
+    return *name == *func_call.name && args == func_call.args;
+}

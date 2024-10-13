@@ -254,6 +254,40 @@ TEST(parser_tests, function_declaration)
     END();
 }
 
+TEST(parser_tests, function_call)
+{
+    BEGIN(
+        "add(1, 2)",
+        new FunctionCall(
+            new SingleNode({Token::Type::Identifier, "add", 1, 1}),
+            {
+                new SingleNode({Token::Type::Number, "1", 1, 5}),
+                new SingleNode({Token::Type::Number, "2", 1, 8}),
+            }
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, function_call_2)
+{
+    BEGIN(
+        "add(1 + 2, 3)",
+        new FunctionCall(
+            new SingleNode({Token::Type::Identifier, "add", 1, 1}),
+            {
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Number, "1", 1, 5}),
+                    new SingleNode({Token::Type::Number, "2", 1, 9}),
+                    {Token::Type::Plus, "+", 1, 7}
+                ),
+                new SingleNode({Token::Type::Number, "3", 1, 12}),
+            }
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
 TEST(parser_tests, if_statement)
 {
     BEGIN(

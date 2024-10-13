@@ -20,6 +20,7 @@ struct ASTNode
         WhileStatement,
         ArrayAccess,
         FieldAccess,
+        FunctionCall,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -75,6 +76,15 @@ struct FunctionDeclaration: public ASTNode
     ASTNode *body;
     FunctionDeclaration(Token name, std::vector<ASTNode *> args, ASTNode *body);
     ~FunctionDeclaration() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct FunctionCall : public ASTNode
+{
+    ASTNode *name;
+    std::vector<ASTNode *> args;
+    FunctionCall(ASTNode *name, std::vector<ASTNode *> args);
+    ~FunctionCall() override;
     bool operator==(const ASTNode &other) const override;
 };
 
