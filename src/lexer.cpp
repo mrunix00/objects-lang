@@ -58,6 +58,12 @@ static inline Token::Type classify_word(const std::string &str)
     if (str == "else") return Token::Type::Else;
     if (str == "while") return Token::Type::While;
     if (str == "function") return Token::Type::Function;
+    if (str == "return") return Token::Type::Return;
+    if (str == "this") return Token::Type::This;
+    if (str == "new") return Token::Type::New;
+    if (str == "true") return Token::Type::True;
+    if (str == "false") return Token::Type::False;
+    if (str == "null") return Token::Type::Null;
     return Token::Type::Identifier;
 }
 

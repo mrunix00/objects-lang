@@ -31,6 +31,12 @@ struct Token
         LooseEquality,
         StrictEquality,
         Dot,
+        This,
+        Return,
+        New,
+        True,
+        False,
+        Null,
     } type;
 
     std::string value;

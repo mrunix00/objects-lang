@@ -130,13 +130,22 @@ TEST(lexer_tests, operators)
 
 TEST(lexer_tests, keywords)
 {
-    auto actual = tokenize("var if else while function");
+    auto actual = tokenize(
+        "var if else while function "
+        "this return new true false null"
+    );
     std::vector<Token> expected = {
         Token{Token::Type::Var, "var", 1, 1},
         Token{Token::Type::If, "if", 1, 5},
         Token{Token::Type::Else, "else", 1, 8},
         Token{Token::Type::While, "while", 1, 13},
         Token{Token::Type::Function, "function", 1, 19},
+        Token{Token::Type::This, "this", 1, 28},
+        Token{Token::Type::Return, "return", 1, 33},
+        Token{Token::Type::New, "new", 1, 40},
+        Token{Token::Type::True, "true", 1, 44},
+        Token{Token::Type::False, "false", 1, 49},
+        Token{Token::Type::Null, "null", 1, 55},
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
