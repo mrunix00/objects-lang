@@ -234,11 +234,10 @@ static ASTNode *read_array_access(Lexer &lexer, std::vector<ASTNode *> &nodes)
     return new ArrayAccess(array, index_nodes.back());
 }
 
-static ASTNode *read_function_call(Lexer &lexer, std::vector<ASTNode *> &nodes)
+static ASTNode *read_function_call(Lexer &lexer)
 {
-    auto name = nodes.back();
-    assert(name->type == ASTNode::Type::SingleNode);
-    nodes.pop_back();
+    auto name = lexer.current();
+    assert(name.type == Token::Type::Identifier);
 
     std::vector<ASTNode *> args;
     auto token = lexer.next();
@@ -252,7 +251,7 @@ static ASTNode *read_function_call(Lexer &lexer, std::vector<ASTNode *> &nodes)
     token = lexer.next();
     assert(token.type == Token::Type::RightParenthesis);
 
-    return new FunctionCall(name, args);
+    return new FunctionCall(new SingleNode(name), args);
 }
 
 static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
@@ -275,8 +274,13 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 return read_var_declaration(lexer);
             case Token::Type::Number:
             case Token::Type::String:
-            case Token::Type::Identifier:
                 return new SingleNode(lexer.next());
+            case Token::Type::Identifier: {
+                auto id = lexer.next();
+                if (lexer.peek().type == Token::Type::LeftParenthesis)
+                    return read_function_call(lexer);
+                return new SingleNode(id);
+            }
             case Token::Type::Plus:
             case Token::Type::Minus:
             case Token::Type::Asterisk:
@@ -298,8 +302,6 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 return new FieldAccess(record, field);
             }
             case Token::Type::LeftParenthesis:
-                if (lexer.current().type == Token::Type::Identifier)
-                    return read_function_call(lexer, nodes);
                 return read_parenthesized_expression(lexer);
             case Token::Type::LeftBracket:
                 return read_array_access(lexer, nodes);
