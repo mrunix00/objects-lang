@@ -10,8 +10,7 @@
     destroy_ast(actual); \
     destroy_ast(expected)
 
-TEST(parser_tests, parse_single_node)
-{
+TEST(parser_tests, parse_single_node) {
     BEGIN(
         "x",
         new SingleNode({Token::Type::Identifier, "x", 1, 1}));
@@ -19,8 +18,7 @@ TEST(parser_tests, parse_single_node)
     END();
 }
 
-TEST(parser_tests, parse_var_assignment)
-{
+TEST(parser_tests, parse_var_assignment) {
     BEGIN(
         "x = 1",
         new BinaryExpression(
@@ -32,8 +30,7 @@ TEST(parser_tests, parse_var_assignment)
     END();
 }
 
-TEST(parser_tests, parse_assignment_with_binary_expression)
-{
+TEST(parser_tests, parse_assignment_with_binary_expression) {
     BEGIN(
         "x = 1 + 2",
         new BinaryExpression(
@@ -49,8 +46,7 @@ TEST(parser_tests, parse_assignment_with_binary_expression)
     END();
 }
 
-TEST(parser_tests, parse_var_declarations)
-{
+TEST(parser_tests, parse_var_declarations) {
     BEGIN(
         "var x",
         new VarDeclaration(
@@ -60,8 +56,7 @@ TEST(parser_tests, parse_var_declarations)
     END();
 }
 
-TEST(parser_tests, parse_var_declarations_with_assignment)
-{
+TEST(parser_tests, parse_var_declarations_with_assignment) {
     BEGIN(
         "var x = 1",
         new BinaryExpression(
@@ -73,8 +68,7 @@ TEST(parser_tests, parse_var_declarations_with_assignment)
     END();
 }
 
-TEST(parser_tests, parse_var_declarations_with_bin_expression)
-{
+TEST(parser_tests, parse_var_declarations_with_bin_expression) {
     BEGIN(
         "var x = 1 + 2",
         new BinaryExpression(
@@ -90,8 +84,7 @@ TEST(parser_tests, parse_var_declarations_with_bin_expression)
     END();
 }
 
-TEST(parser_tests, operator_precedence)
-{
+TEST(parser_tests, operator_precedence) {
     BEGIN(
         "1 + 2 * 3",
         new BinaryExpression(
@@ -107,8 +100,7 @@ TEST(parser_tests, operator_precedence)
     END();
 }
 
-TEST(parser_tests, operator_precedence_2)
-{
+TEST(parser_tests, operator_precedence_2) {
     BEGIN(
         "1 * 2 + 3",
         new BinaryExpression(
@@ -124,8 +116,7 @@ TEST(parser_tests, operator_precedence_2)
     END();
 }
 
-TEST(parser_tests, operator_precedence_3)
-{
+TEST(parser_tests, operator_precedence_3) {
     BEGIN(
         "x = 1 * 2 + 3 / 2",
         new BinaryExpression(
@@ -150,8 +141,7 @@ TEST(parser_tests, operator_precedence_3)
     END();
 }
 
-TEST(parser_tests, multiline_expression)
-{
+TEST(parser_tests, multiline_expression) {
     BEGIN(
         "1 + 2\n"
         "- 3\n"
@@ -175,8 +165,7 @@ TEST(parser_tests, multiline_expression)
     END();
 }
 
-TEST(parser_tests, parenthesis_precedence)
-{
+TEST(parser_tests, parenthesis_precedence) {
     BEGIN(
         "(1 + 2) * 3",
         new BinaryExpression(
@@ -194,8 +183,7 @@ TEST(parser_tests, parenthesis_precedence)
     END();
 }
 
-TEST(parser_tests, multiple_expressions)
-{
+TEST(parser_tests, multiple_expressions) {
     BEGIN(
         "1 + 2; 3 + 4",
         new BinaryExpression(
@@ -212,8 +200,7 @@ TEST(parser_tests, multiple_expressions)
     END();
 }
 
-TEST(parser_tests, multiple_expressions_2)
-{
+TEST(parser_tests, multiple_expressions_2) {
     BEGIN(
         "1 + 2\n3 * 4",
         new BinaryExpression(
@@ -230,23 +217,22 @@ TEST(parser_tests, multiple_expressions_2)
     END();
 }
 
-TEST(parser_tests, function_declaration)
-{
+TEST(parser_tests, function_declaration) {
     BEGIN(
         "function add(x, y) { x + y }",
         new FunctionDeclaration(
             {Token::Type::Identifier, "add", 1, 10},
             {
-                new SingleNode({Token::Type::Identifier, "x", 1, 14}),
-                new SingleNode({Token::Type::Identifier, "y", 1, 17}),
+            new SingleNode({Token::Type::Identifier, "x", 1, 14}),
+            new SingleNode({Token::Type::Identifier, "y", 1, 17}),
             },
             new ScopeBlock(
                 {
-                    new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 22}),
-                        new SingleNode({Token::Type::Identifier, "y", 1, 26}),
-                        {Token::Type::Plus, "+", 1, 24}
-                    ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Identifier, "x", 1, 22}),
+                    new SingleNode({Token::Type::Identifier, "y", 1, 26}),
+                    {Token::Type::Plus, "+", 1, 24}
+                ),
                 }
             )
         ));
@@ -254,42 +240,39 @@ TEST(parser_tests, function_declaration)
     END();
 }
 
-TEST(parser_tests, function_call)
-{
+TEST(parser_tests, function_call) {
     BEGIN(
         "add(1, 2)",
         new FunctionCall(
             new SingleNode({Token::Type::Identifier, "add", 1, 1}),
             {
-                new SingleNode({Token::Type::Number, "1", 1, 5}),
-                new SingleNode({Token::Type::Number, "2", 1, 8}),
+            new SingleNode({Token::Type::Number, "1", 1, 5}),
+            new SingleNode({Token::Type::Number, "2", 1, 8}),
             }
         ));
     EXPECT_EQ(expected, actual);
     END();
 }
 
-TEST(parser_tests, function_call_2)
-{
+TEST(parser_tests, function_call_2) {
     BEGIN(
         "add(1 + 2, 3)",
         new FunctionCall(
             new SingleNode({Token::Type::Identifier, "add", 1, 1}),
             {
-                new BinaryExpression(
-                    new SingleNode({Token::Type::Number, "1", 1, 5}),
-                    new SingleNode({Token::Type::Number, "2", 1, 9}),
-                    {Token::Type::Plus, "+", 1, 7}
-                ),
-                new SingleNode({Token::Type::Number, "3", 1, 12}),
+            new BinaryExpression(
+                new SingleNode({Token::Type::Number, "1", 1, 5}),
+                new SingleNode({Token::Type::Number, "2", 1, 9}),
+                {Token::Type::Plus, "+", 1, 7}
+            ),
+            new SingleNode({Token::Type::Number, "3", 1, 12}),
             }
         ));
     EXPECT_EQ(expected, actual);
     END();
 }
 
-TEST(parser_tests, if_statement)
-{
+TEST(parser_tests, if_statement) {
     BEGIN(
         "if (x == 0) { x = 0 }",
         new IfStatement(
@@ -300,11 +283,11 @@ TEST(parser_tests, if_statement)
             ),
             new ScopeBlock(
                 {
-                    new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 15}),
-                        new SingleNode({Token::Type::Number, "0", 1, 19}),
-                        {Token::Type::Equals, "=", 1, 17}
-                    ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Identifier, "x", 1, 15}),
+                    new SingleNode({Token::Type::Number, "0", 1, 19}),
+                    {Token::Type::Equals, "=", 1, 17}
+                ),
                 }
             )
         ));
@@ -312,28 +295,27 @@ TEST(parser_tests, if_statement)
     END();
 }
 
-TEST(parser_tests, if_else_statement)
-{
+TEST(parser_tests, if_else_statement) {
     BEGIN(
         "if (x) { x = 0 } else { x = 1 }",
         new IfStatement(
             new SingleNode({Token::Type::Identifier, "x", 1, 5}),
             new ScopeBlock(
                 {
-                    new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 10}),
-                        new SingleNode({Token::Type::Number, "0", 1, 14}),
-                        {Token::Type::Equals, "=", 1, 12}
-                    ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Identifier, "x", 1, 10}),
+                    new SingleNode({Token::Type::Number, "0", 1, 14}),
+                    {Token::Type::Equals, "=", 1, 12}
+                ),
                 }
             ),
             new ScopeBlock(
                 {
-                    new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 25}),
-                        new SingleNode({Token::Type::Number, "1", 1, 29}),
-                        {Token::Type::Equals, "=", 1, 27}
-                    ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Identifier, "x", 1, 25}),
+                    new SingleNode({Token::Type::Number, "1", 1, 29}),
+                    {Token::Type::Equals, "=", 1, 27}
+                ),
                 }
             )
         ));
@@ -341,8 +323,7 @@ TEST(parser_tests, if_else_statement)
     END();
 }
 
-TEST(parser_tests, if_statement_no_scope_block)
-{
+TEST(parser_tests, if_statement_no_scope_block) {
     BEGIN(
         "if (x) x = 0\n"
         "else x = 1",
@@ -363,19 +344,18 @@ TEST(parser_tests, if_statement_no_scope_block)
     END();
 }
 
-TEST(parser_tests, while_statement)
-{
+TEST(parser_tests, while_statement) {
     BEGIN(
         "while (x) { x = 0 }",
         new WhileStatement(
             new SingleNode({Token::Type::Identifier, "x", 1, 8}),
             new ScopeBlock(
                 {
-                    new BinaryExpression(
-                        new SingleNode({Token::Type::Identifier, "x", 1, 13}),
-                        new SingleNode({Token::Type::Number, "0", 1, 17}),
-                        {Token::Type::Equals, "=", 1, 15}
-                    ),
+                new BinaryExpression(
+                    new SingleNode({Token::Type::Identifier, "x", 1, 13}),
+                    new SingleNode({Token::Type::Number, "0", 1, 17}),
+                    {Token::Type::Equals, "=", 1, 15}
+                ),
                 }
             )
         ));
@@ -383,8 +363,7 @@ TEST(parser_tests, while_statement)
     END();
 }
 
-TEST(parser_tests, array_accesser)
-{
+TEST(parser_tests, array_accesser) {
     BEGIN(
         "x[0]",
         new ArrayAccess(
@@ -395,13 +374,28 @@ TEST(parser_tests, array_accesser)
     END();
 }
 
-TEST(parser_tests, field_accessor)
-{
+TEST(parser_tests, field_accessor) {
     BEGIN(
         "x.y",
         new FieldAccess(
             new SingleNode({Token::Type::Identifier, "x", 1, 1}),
             new SingleNode({Token::Type::Identifier, "y", 1, 3})
+        ));
+    EXPECT_EQ(expected, actual);
+    END();
+}
+
+TEST(parser_tests, constructor) {
+    BEGIN(
+        "new Point(0, 0)",
+        new Constructor(
+            new FunctionCall(
+                new SingleNode({Token::Type::Identifier, "Point", 1, 5}),
+                {
+                new SingleNode({Token::Type::Number, "0", 1, 11}),
+                new SingleNode({Token::Type::Number, "0", 1, 14}),
+                }
+            )
         ));
     EXPECT_EQ(expected, actual);
     END();

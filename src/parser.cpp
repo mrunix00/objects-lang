@@ -305,6 +305,11 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
                 return read_parenthesized_expression(lexer);
             case Token::Type::LeftBracket:
                 return read_array_access(lexer, nodes);
+            case Token::Type::New: {
+                lexer.next(); // consume 'new'
+                auto type = read_expression(lexer, nodes);
+                return new Constructor(type);
+            }
             default:
                 throw std::runtime_error("Unhandled token: " +
                     std::to_string((int) lexer.peek().type));

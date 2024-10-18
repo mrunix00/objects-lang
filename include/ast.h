@@ -21,6 +21,7 @@ struct ASTNode
         ArrayAccess,
         FieldAccess,
         FunctionCall,
+        Constructor,
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
@@ -131,6 +132,13 @@ struct FieldAccess: public ASTNode
     ASTNode *field;
     FieldAccess(ASTNode *record, ASTNode *field);
     ~FieldAccess() override;
+    bool operator==(const ASTNode &other) const override;
+};
+
+struct Constructor: public ASTNode {
+    ASTNode *record;
+    explicit Constructor(ASTNode *record);
+    ~Constructor() override;
     bool operator==(const ASTNode &other) const override;
 };
 
