@@ -1,9 +1,10 @@
 #include "ast.h"
 
-#include <utility>
 #include <cassert>
+#include <utility>
 
-bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *> &right) {
+bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *> &right)
+{
     if (left.size() != right.size())
         return false;
     for (size_t i = 0; i < left.size(); ++i) {
@@ -13,39 +14,47 @@ bool operator==(const std::vector<ASTNode *> &left, const std::vector<ASTNode *>
     return true;
 }
 
-void destroy_ast(std::vector<ASTNode *> &ast) {
-    for (auto &node: ast)
+void destroy_ast(const std::vector<ASTNode *> &ast)
+{
+    for (auto &node : ast)
         delete node;
 }
 
 SingleNode::SingleNode(Token token)
-    : token(std::move(token)) { type = Type::SingleNode; }
-
-bool SingleNode::operator==(const ASTNode &other) const {
-    return type == other.type &&
-           token == dynamic_cast<const SingleNode &>(other).token;
+    : token(std::move(token))
+{
+    type = Type::SingleNode;
+}
+bool SingleNode::operator==(const ASTNode &other) const
+{
+    return type == other.type && token == dynamic_cast<const SingleNode &>(other).token;
 }
 
 VarDeclaration::VarDeclaration(Token name)
-    : name(std::move(name)) { type = Type::VarDeclaration; }
-
-bool VarDeclaration::operator==(const ASTNode &other) const {
-    return type == other.type &&
-           name == dynamic_cast<const VarDeclaration &>(other).name;
+    : name(std::move(name))
+{
+    type = Type::VarDeclaration;
+}
+bool VarDeclaration::operator==(const ASTNode &other) const
+{
+    return type == other.type && name == dynamic_cast<const VarDeclaration &>(other).name;
 }
 
 BinaryExpression::BinaryExpression(ASTNode *left, ASTNode *right, Token op)
-    : left(left), right(right), op(std::move(op)) {
+    : left(left)
+    , right(right)
+    , op(std::move(op))
+{
     type = Type::BinaryExpression;
     assert(left != nullptr && right != nullptr);
 }
-
-BinaryExpression::~BinaryExpression() {
+BinaryExpression::~BinaryExpression()
+{
     delete left;
     delete right;
 }
-
-bool BinaryExpression::operator==(const ASTNode &other) const {
+bool BinaryExpression::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &expr = dynamic_cast<const BinaryExpression &>(other);
@@ -53,14 +62,18 @@ bool BinaryExpression::operator==(const ASTNode &other) const {
 }
 
 UnaryExpression::UnaryExpression(Token op, ASTNode *operand)
-    : op(std::move(op)), operand(operand) {
+    : op(std::move(op))
+    , operand(operand)
+{
     type = Type::UnaryExpression;
     assert(operand != nullptr);
 }
-
-UnaryExpression::~UnaryExpression() { delete operand; }
-
-bool UnaryExpression::operator==(const ASTNode &other) const {
+UnaryExpression::~UnaryExpression()
+{
+    delete operand;
+}
+bool UnaryExpression::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &expr = dynamic_cast<const UnaryExpression &>(other);
@@ -68,38 +81,39 @@ bool UnaryExpression::operator==(const ASTNode &other) const {
 }
 
 ParenthesizedExpression::ParenthesizedExpression(ASTNode *expression)
-    : expression(expression) {
+    : expression(expression)
+{
     type = Type::ParenthesizedExpression;
     assert(expression != nullptr);
 }
-
-ParenthesizedExpression::~ParenthesizedExpression() {
+ParenthesizedExpression::~ParenthesizedExpression()
+{
     delete expression;
 }
-
-bool ParenthesizedExpression::operator==(const ASTNode &other) const {
+bool ParenthesizedExpression::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &expr = dynamic_cast<const ParenthesizedExpression &>(other);
     return *expression == *expr.expression;
 }
 
-FunctionDeclaration::FunctionDeclaration(
-    Token name,
-    std::vector<ASTNode *> args,
-    ASTNode *body)
-    : name(std::move(name)), args(std::move(args)), body(body) {
+FunctionDeclaration::FunctionDeclaration(Token name, std::vector<ASTNode *> args, ASTNode *body)
+    : name(std::move(name))
+    , args(std::move(args))
+    , body(body)
+{
     type = Type::FunctionDeclaration;
     assert(body != nullptr);
 }
-
-FunctionDeclaration::~FunctionDeclaration() {
+FunctionDeclaration::~FunctionDeclaration()
+{
     delete body;
-    for (auto &arg: args)
+    for (auto &arg : args)
         delete arg;
 }
-
-bool FunctionDeclaration::operator==(const ASTNode &other) const {
+bool FunctionDeclaration::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &func = dynamic_cast<const FunctionDeclaration &>(other);
@@ -107,14 +121,17 @@ bool FunctionDeclaration::operator==(const ASTNode &other) const {
 }
 
 ScopeBlock::ScopeBlock(std::vector<ASTNode *> statements)
-    : statements(std::move(statements)) { type = Type::ScopeBlock; }
-
-ScopeBlock::~ScopeBlock() {
-    for (auto &statement: statements)
+    : statements(std::move(statements))
+{
+    type = Type::ScopeBlock;
+}
+ScopeBlock::~ScopeBlock()
+{
+    for (auto &statement : statements)
         delete statement;
 }
-
-bool ScopeBlock::operator==(const ASTNode &other) const {
+bool ScopeBlock::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &block = dynamic_cast<const ScopeBlock &>(other);
@@ -122,92 +139,109 @@ bool ScopeBlock::operator==(const ASTNode &other) const {
 }
 
 IfStatement::IfStatement(ASTNode *condition, ASTNode *body, ASTNode *else_body)
-    : condition(condition), body(body), else_body(else_body) { type = Type::IfStatement; }
-
+    : condition(condition)
+    , body(body)
+    , else_body(else_body)
+{
+    type = Type::IfStatement;
+}
 IfStatement::IfStatement(ASTNode *condition, ASTNode *body)
-    : condition(condition), body(body) { type = Type::IfStatement; }
-
-IfStatement::~IfStatement() {
+    : condition(condition)
+    , body(body)
+{
+    type = Type::IfStatement;
+}
+IfStatement::~IfStatement()
+{
     delete condition;
     delete body;
     if (else_body.has_value())
         delete else_body.value();
 }
-
-bool IfStatement::operator==(const ASTNode &other) const {
+bool IfStatement::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &if_stmt = dynamic_cast<const IfStatement &>(other);
     if (if_stmt.else_body.has_value() != else_body.has_value())
         return false;
-    if (if_stmt.else_body.has_value() &&
-        *if_stmt.else_body.value() != *else_body.value())
+    if (if_stmt.else_body.has_value() && *if_stmt.else_body.value() != *else_body.value())
         return false;
-    return *condition == *if_stmt.condition &&
-           *body == *if_stmt.body;
+    return *condition == *if_stmt.condition && *body == *if_stmt.body;
 }
 
 WhileStatement::WhileStatement(ASTNode *condition, ASTNode *body)
-    : condition(condition), body(body) { type = Type::WhileStatement; }
-
-WhileStatement::~WhileStatement() {
+    : condition(condition)
+    , body(body)
+{
+    type = Type::WhileStatement;
+}
+WhileStatement::~WhileStatement()
+{
     delete condition;
     delete body;
 }
-
-bool WhileStatement::operator==(const ASTNode &other) const {
+bool WhileStatement::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &while_stmt = dynamic_cast<const WhileStatement &>(other);
-    return *condition == *while_stmt.condition &&
-           *body == *while_stmt.body;
+    return *condition == *while_stmt.condition && *body == *while_stmt.body;
 }
 
 ArrayAccess::ArrayAccess(ASTNode *array, ASTNode *index)
-    : array(array), index(index) { type = Type::ArrayAccess; }
-
-ArrayAccess::~ArrayAccess() {
+    : array(array)
+    , index(index)
+{
+    type = Type::ArrayAccess;
+}
+ArrayAccess::~ArrayAccess()
+{
     delete array;
     delete index;
 }
-
-bool ArrayAccess::operator==(const ASTNode &other) const {
+bool ArrayAccess::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &array_access = dynamic_cast<const ArrayAccess &>(other);
-    return *array == *array_access.array &&
-           *index == *array_access.index;
+    return *array == *array_access.array && *index == *array_access.index;
 }
 
 FieldAccess::FieldAccess(ASTNode *record, ASTNode *field)
-    : record(record), field(field) {
+    : record(record)
+    , field(field)
+{
     type = Type::FieldAccess;
     assert(record != nullptr && field != nullptr);
 }
-
-FieldAccess::~FieldAccess() {
+FieldAccess::~FieldAccess()
+{
     delete record;
     delete field;
 }
-
-bool FieldAccess::operator==(const ASTNode &other) const {
+bool FieldAccess::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &field_access = dynamic_cast<const FieldAccess &>(other);
-    return *record == *field_access.record &&
-           *field == *field_access.field;
+    return *record == *field_access.record && *field == *field_access.field;
 }
 
 FunctionCall::FunctionCall(ASTNode *name, std::vector<ASTNode *> args)
-    : name(name), args(std::move(args)) { type = Type::FunctionCall; }
-
-FunctionCall::~FunctionCall() {
+    : name(name)
+    , args(std::move(args))
+{
+    type = Type::FunctionCall;
+}
+FunctionCall::~FunctionCall()
+{
     delete name;
-    for (auto &arg: args)
+    for (auto &arg : args)
         delete arg;
 }
-
-bool FunctionCall::operator==(const ASTNode &other) const {
+bool FunctionCall::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &func_call = dynamic_cast<const FunctionCall &>(other);
@@ -215,13 +249,16 @@ bool FunctionCall::operator==(const ASTNode &other) const {
 }
 
 Constructor::Constructor(ASTNode *record)
-    : record(record) { type = Type::Constructor; }
-
-Constructor::~Constructor() {
+    : record(record)
+{
+    type = Type::Constructor;
+}
+Constructor::~Constructor()
+{
     delete record;
 }
-
-bool Constructor::operator==(const ASTNode &other) const {
+bool Constructor::operator==(const ASTNode &other) const
+{
     if (type != other.type)
         return false;
     auto &constructor = dynamic_cast<const Constructor &>(other);

@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "lexer.h"
+#include <gtest/gtest.h>
 
 std::vector<Token> tokenize(const std::string &input)
 {
@@ -15,8 +15,8 @@ std::vector<Token> tokenize(const std::string &input)
 
 TEST(lexer_tests, skip_whitespace)
 {
-    auto actual = tokenize(" \t   ");
-    std::vector<Token> expected = {
+    const auto actual = tokenize(" \t   ");
+    const std::vector<Token> expected = {
         Token{Token::Type::EndOfFile},
     };
     EXPECT_EQ(actual, expected);
@@ -24,8 +24,8 @@ TEST(lexer_tests, skip_whitespace)
 
 TEST(lexer_tests, identifiers)
 {
-    auto actual = tokenize("abc var_1 var2");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("abc var_1 var2");
+    const std::vector<Token> expected = {
         Token{Token::Type::Identifier, "abc", 1, 1},
         Token{Token::Type::Identifier, "var_1", 1, 5},
         Token{Token::Type::Identifier, "var2", 1, 11},
@@ -36,8 +36,8 @@ TEST(lexer_tests, identifiers)
 
 TEST(lexer_tests, integers)
 {
-    auto actual = tokenize("1 123");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("1 123");
+    const std::vector<Token> expected = {
         Token{Token::Type::Number, "1", 1, 1},
         Token{Token::Type::Number, "123", 1, 3},
         Token{Token::Type::EndOfFile},
@@ -47,8 +47,8 @@ TEST(lexer_tests, integers)
 
 TEST(lexer_tests, real_numbers)
 {
-    auto actual = tokenize("3.1415 -3.1E12 .1e12 2E-12");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("3.1415 -3.1E12 .1e12 2E-12");
+    const std::vector<Token> expected = {
         Token{Token::Type::Number, "3.1415", 1, 1},
         Token{Token::Type::Number, "-3.1E12", 1, 8},
         Token{Token::Type::Number, ".1e12", 1, 16},
@@ -60,8 +60,8 @@ TEST(lexer_tests, real_numbers)
 
 TEST(lexer_tests, strings)
 {
-    auto actual = tokenize("\"Hello world\"");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("\"Hello world\"");
+    const std::vector<Token> expected = {
         Token{Token::Type::String, "Hello world", 1, 1},
         Token{Token::Type::EndOfFile},
     };
@@ -70,8 +70,8 @@ TEST(lexer_tests, strings)
 
 TEST(lexer_tests, string_with_escape_sequence)
 {
-    auto actual = tokenize(R"("Hello \"world\"")");
-    std::vector<Token> expected = {
+    const auto actual = tokenize(R"("Hello \"world\"")");
+    const std::vector<Token> expected = {
         Token{Token::Type::String, "Hello \"world\"", 1, 1},
         Token{Token::Type::EndOfFile},
     };
@@ -80,8 +80,8 @@ TEST(lexer_tests, string_with_escape_sequence)
 
 TEST(lexer_tests, multiple_lines)
 {
-    auto actual = tokenize("test\nlol\n123");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("test\nlol\n123");
+    const std::vector<Token> expected = {
         Token{Token::Type::Identifier, "test", 1, 1},
         Token{Token::Type::Identifier, "lol", 2, 1},
         Token{Token::Type::Number, "123", 3, 1},
@@ -92,8 +92,8 @@ TEST(lexer_tests, multiple_lines)
 
 TEST(lexer_tests, comments)
 {
-    auto actual = tokenize("test // this is a comment\nlol");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("test // this is a comment\nlol");
+    const std::vector<Token> expected = {
         Token{Token::Type::Identifier, "test", 1, 1},
         Token{Token::Type::Identifier, "lol", 2, 1},
         Token{Token::Type::EndOfFile},
@@ -103,8 +103,8 @@ TEST(lexer_tests, comments)
 
 TEST(lexer_tests, multi_line_comments)
 {
-    auto actual = tokenize("test /*\nthis is a comment\n*/lol");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("test /*\nthis is a comment\n*/lol");
+    const std::vector<Token> expected = {
         Token{Token::Type::Identifier, "test", 1, 1},
         Token{Token::Type::Identifier, "lol", 3, 3},
         Token{Token::Type::EndOfFile},
@@ -114,8 +114,8 @@ TEST(lexer_tests, multi_line_comments)
 
 TEST(lexer_tests, operators)
 {
-    auto actual = tokenize("+-*/= == ===");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("+-*/= == ===");
+    const std::vector<Token> expected = {
         Token{Token::Type::Plus, "+", 1, 1},
         Token{Token::Type::Minus, "-", 1, 2},
         Token{Token::Type::Asterisk, "*", 1, 3},
@@ -130,11 +130,10 @@ TEST(lexer_tests, operators)
 
 TEST(lexer_tests, keywords)
 {
-    auto actual = tokenize(
+    const auto actual = tokenize(
         "var if else while function "
-        "this return new true false null"
-    );
-    std::vector<Token> expected = {
+        "this return new true false null");
+    const std::vector<Token> expected = {
         Token{Token::Type::Var, "var", 1, 1},
         Token{Token::Type::If, "if", 1, 5},
         Token{Token::Type::Else, "else", 1, 8},
@@ -153,8 +152,8 @@ TEST(lexer_tests, keywords)
 
 TEST(lexer_tests, punctuation)
 {
-    auto actual = tokenize("();{},[].");
-    std::vector<Token> expected = {
+    const auto actual = tokenize("();{},[].");
+    const std::vector<Token> expected = {
         Token{Token::Type::LeftParenthesis, "(", 1, 1},
         Token{Token::Type::RightParenthesis, ")", 1, 2},
         Token{Token::Type::Semicolon, ";", 1, 3},

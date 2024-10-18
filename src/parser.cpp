@@ -1,10 +1,9 @@
-#include <cassert>
-#include <stdexcept>
-#include <iostream>
 #include "parser.h"
+#include <cassert>
+#include <iostream>
+#include <stdexcept>
 
-enum class Precedence
-{
+enum class Precedence {
     Lowest = 0,
     Equals,
     Sum,
@@ -15,30 +14,30 @@ enum class Precedence
 static Precedence get_precedence(Token::Type type)
 {
     switch (type) {
-        case Token::Type::StrictEquality:
-        case Token::Type::LooseEquality:
-        case Token::Type::Equals:
-            return Precedence::Equals;
-        case Token::Type::Plus:
-        case Token::Type::Minus:
-            return Precedence::Sum;
-        case Token::Type::Asterisk:
-        case Token::Type::Slash:
-            return Precedence::Product;
-        default:
-            return Precedence::Lowest;
+    case Token::Type::StrictEquality:
+    case Token::Type::LooseEquality:
+    case Token::Type::Equals:
+        return Precedence::Equals;
+    case Token::Type::Plus:
+    case Token::Type::Minus:
+        return Precedence::Sum;
+    case Token::Type::Asterisk:
+    case Token::Type::Slash:
+        return Precedence::Product;
+    default:
+        return Precedence::Lowest;
     }
 }
 
 static Precedence get_precedence(const ASTNode *node)
 {
     switch (node->type) {
-        case ASTNode::Type::BinaryExpression:
-            return get_precedence(dynamic_cast<const BinaryExpression *>(node)->op.type);
-        case ASTNode::Type::ParenthesizedExpression:
-            return Precedence::Parenthesis;
-        default:
-            return Precedence::Lowest;
+    case ASTNode::Type::BinaryExpression:
+        return get_precedence(dynamic_cast<const BinaryExpression *>(node)->op.type);
+    case ASTNode::Type::ParenthesizedExpression:
+        return Precedence::Parenthesis;
+    default:
+        return Precedence::Lowest;
     }
 }
 
@@ -58,21 +57,18 @@ static ASTNode *handle_precedence(ASTNode *old, ASTNode *new_node, const Token &
     }
     auto old_node = dynamic_cast<BinaryExpression *>(old);
     if (get_precedence(op.type) >= get_precedence(old)) {
-        auto right =
-            old_node->right->type == ASTNode::Type::BinaryExpression ?
-            handle_precedence(old_node->right, new_node, op) :
-            new BinaryExpression(old_node->right, new_node, op);
+        auto right = old_node->right->type == ASTNode::Type::BinaryExpression
+                         ? handle_precedence(old_node->right, new_node, op)
+                         : new BinaryExpression(old_node->right, new_node, op);
         return new BinaryExpression(old_node->left, right, old_node->op);
-    }
-    else {
+    } else {
         return new BinaryExpression(old, new_node, op);
     }
 }
 
 static bool is_expression_ended(const Token &current, const Token &next)
 {
-    if (next.type == Token::Type::Semicolon ||
-        next.type == Token::Type::EndOfFile)
+    if (next.type == Token::Type::Semicolon || next.type == Token::Type::EndOfFile)
         return true;
     if (next.line > current.line)
         return true;
@@ -169,9 +165,8 @@ static ASTNode *read_if_statement(Lexer &lexer)
 
     // read body
     token = lexer.peek();
-    ASTNode *body = token.type == Token::Type::LeftBrace ?
-                    read_scope_block(lexer) :
-                    read_expression(lexer);
+    ASTNode *body = token.type == Token::Type::LeftBrace ? read_scope_block(lexer)
+                                                         : read_expression(lexer);
 
     // read else clause if found
     if (lexer.peek().type == Token::Type::Else) {
@@ -264,55 +259,54 @@ static ASTNode *read_expression(Lexer &lexer, std::vector<ASTNode *> &nodes)
             return read_expression(lexer, nodes);
         }
         switch (lexer.peek().type) {
-            case Token::Type::If:
-                return read_if_statement(lexer);
-            case Token::Type::While:
-                return read_while_statement(lexer);
-            case Token::Type::Function:
-                return read_func_declaration(lexer);
-            case Token::Type::Var:
-                return read_var_declaration(lexer);
-            case Token::Type::Number:
-            case Token::Type::String:
-                return new SingleNode(lexer.next());
-            case Token::Type::Identifier: {
-                auto id = lexer.next();
-                if (lexer.peek().type == Token::Type::LeftParenthesis)
-                    return read_function_call(lexer);
-                return new SingleNode(id);
-            }
-            case Token::Type::Plus:
-            case Token::Type::Minus:
-            case Token::Type::Asterisk:
-            case Token::Type::Slash:
-            case Token::Type::Equals:
-            case Token::Type::LooseEquality:
-            case Token::Type::StrictEquality: {
-                auto op = lexer.next();
-                auto left = nodes.back();
-                nodes.pop_back();
-                auto right = read_expression(lexer, nodes);
-                return handle_precedence(left, right, op);
-            }
-            case Token::Type::Dot: {
-                auto token = lexer.next(); // consume '.'
-                auto field = read_expression(lexer, nodes);
-                auto record = nodes.back();
-                nodes.pop_back();
-                return new FieldAccess(record, field);
-            }
-            case Token::Type::LeftParenthesis:
-                return read_parenthesized_expression(lexer);
-            case Token::Type::LeftBracket:
-                return read_array_access(lexer, nodes);
-            case Token::Type::New: {
-                lexer.next(); // consume 'new'
-                auto type = read_expression(lexer, nodes);
-                return new Constructor(type);
-            }
-            default:
-                throw std::runtime_error("Unhandled token: " +
-                    std::to_string((int) lexer.peek().type));
+        case Token::Type::If:
+            return read_if_statement(lexer);
+        case Token::Type::While:
+            return read_while_statement(lexer);
+        case Token::Type::Function:
+            return read_func_declaration(lexer);
+        case Token::Type::Var:
+            return read_var_declaration(lexer);
+        case Token::Type::Number:
+        case Token::Type::String:
+            return new SingleNode(lexer.next());
+        case Token::Type::Identifier: {
+            auto id = lexer.next();
+            if (lexer.peek().type == Token::Type::LeftParenthesis)
+                return read_function_call(lexer);
+            return new SingleNode(id);
+        }
+        case Token::Type::Plus:
+        case Token::Type::Minus:
+        case Token::Type::Asterisk:
+        case Token::Type::Slash:
+        case Token::Type::Equals:
+        case Token::Type::LooseEquality:
+        case Token::Type::StrictEquality: {
+            auto op = lexer.next();
+            auto left = nodes.back();
+            nodes.pop_back();
+            auto right = read_expression(lexer, nodes);
+            return handle_precedence(left, right, op);
+        }
+        case Token::Type::Dot: {
+            auto token = lexer.next(); // consume '.'
+            auto field = read_expression(lexer, nodes);
+            auto record = nodes.back();
+            nodes.pop_back();
+            return new FieldAccess(record, field);
+        }
+        case Token::Type::LeftParenthesis:
+            return read_parenthesized_expression(lexer);
+        case Token::Type::LeftBracket:
+            return read_array_access(lexer, nodes);
+        case Token::Type::New: {
+            lexer.next(); // consume 'new'
+            const auto type = read_expression(lexer, nodes);
+            return new Constructor(type);
+        }
+        default:
+            throw std::runtime_error("Unhandled token: " + std::to_string(static_cast<int>(lexer.peek().type)));
         }
     }
     return nullptr;
