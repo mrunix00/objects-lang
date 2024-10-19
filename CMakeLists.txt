@@ -16,7 +16,10 @@ enable_testing()
 file(GLOB_RECURSE SRC src/*.cpp)
 file(GLOB_RECURSE TESTS tests/*.cpp)
 
-add_executable(ObjectsScript main.cpp ${SRC})
-add_executable(ObjectsScriptTest ${SRC} ${TESTS})
+add_executable(ObjectsScript main.cpp ${SRC}
+        include/runtime.h
+        src/runtime.cpp)
+add_executable(ObjectsScriptTest ${SRC} ${TESTS}
+        tests/runtime_tests.cpp)
 
 target_link_libraries(ObjectsScriptTest GTest::gtest_main GTest::gmock_main)

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "lexer.h"
+#include "runtime.h"
+
 #include <optional>
+#include <stdexcept>
 #include <vector>
 
 struct ASTNode
@@ -24,6 +27,10 @@ struct ASTNode
     } type;
     virtual ~ASTNode() = default;
     virtual bool operator==(const ASTNode &other) const = 0;
+    virtual void compile(OLRuntime::Program &program) const
+    {
+        throw std::runtime_error("Unimplemented method!");
+    }
     bool operator!=(const ASTNode &other) const { return !(*this == other); }
 };
 
@@ -31,6 +38,7 @@ struct SingleNode final : public ASTNode
 {
     Token token;
     explicit SingleNode(Token);
+    void compile(OLRuntime::Program &program) const override;
     bool operator==(const ASTNode &other) const override;
 };
 
@@ -48,6 +56,7 @@ struct BinaryExpression final : public ASTNode
     Token op;
     BinaryExpression(ASTNode *left, ASTNode *right, Token op);
     ~BinaryExpression() override;
+    void compile(OLRuntime::Program &program) const override;
     bool operator==(const ASTNode &other) const override;
 };
 

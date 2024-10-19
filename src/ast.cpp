@@ -25,6 +25,20 @@ SingleNode::SingleNode(Token token)
 {
     type = Type::SingleNode;
 }
+void SingleNode::compile(OLRuntime::Program &program) const
+{
+    switch (token.type) {
+    case Token::Type::Number: {
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::LoadNumber,
+            .data = {.number = {std::stod(token.value)}},
+        });
+    } break;
+    default:
+        throw std::runtime_error("Unimplemented method!");
+    }
+}
+
 bool SingleNode::operator==(const ASTNode &other) const
 {
     return type == other.type && token == dynamic_cast<const SingleNode &>(other).token;
@@ -52,6 +66,14 @@ BinaryExpression::~BinaryExpression()
 {
     delete left;
     delete right;
+}
+void BinaryExpression::compile(OLRuntime::Program &program) const
+{
+    left->compile(program);
+    right->compile(program);
+    program.instructions.push_back({
+        .type = OLRuntime::Instruction::Type::Add,
+    });
 }
 bool BinaryExpression::operator==(const ASTNode &other) const
 {
