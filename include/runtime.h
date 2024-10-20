@@ -11,6 +11,9 @@ struct Instruction
         Invalid,
         LoadNumber,
         Add,
+        Sub,
+        Mul,
+        Div,
         End,
     } type
         = Type::Invalid;

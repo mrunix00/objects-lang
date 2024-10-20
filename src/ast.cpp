@@ -71,9 +71,30 @@ void BinaryExpression::compile(OLRuntime::Program &program) const
 {
     left->compile(program);
     right->compile(program);
-    program.instructions.push_back({
-        .type = OLRuntime::Instruction::Type::Add,
-    });
+    switch (op.type) {
+    case Token::Type::Plus:
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::Add,
+        });
+        break;
+    case Token::Type::Minus:
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::Sub,
+        });
+        break;
+    case Token::Type::Asterisk:
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::Mul,
+        });
+        break;
+    case Token::Type::Slash:
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::Div,
+        });
+        break;
+    default:
+        throw std::runtime_error("Unimplemented method!");
+    }
 }
 bool BinaryExpression::operator==(const ASTNode &other) const
 {

@@ -16,6 +16,27 @@ void OLRuntime::OLRuntime::execute()
             stack.pop_back();
             stack.push_back(x + y);
         } break;
+        case Instruction::Type::Sub: {
+            const auto x = stack.back();
+            stack.pop_back();
+            const auto y = stack.back();
+            stack.pop_back();
+            stack.push_back(y - x);
+        } break;
+        case Instruction::Type::Mul: {
+            const auto x = stack.back();
+            stack.pop_back();
+            const auto y = stack.back();
+            stack.pop_back();
+            stack.push_back(x * y);
+        } break;
+        case Instruction::Type::Div: {
+            const auto x = stack.back();
+            stack.pop_back();
+            const auto y = stack.back();
+            stack.pop_back();
+            stack.push_back(y / x);
+        } break;
         case Instruction::Type::End:
             return;
         default:;
