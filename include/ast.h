@@ -34,7 +34,7 @@ struct ASTNode
     bool operator!=(const ASTNode &other) const { return !(*this == other); }
 };
 
-struct SingleNode final : public ASTNode
+struct SingleNode final : ASTNode
 {
     Token token;
     explicit SingleNode(Token);
@@ -42,7 +42,7 @@ struct SingleNode final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct VarDeclaration final : public ASTNode
+struct VarDeclaration final : ASTNode
 {
     Token name;
     explicit VarDeclaration(Token name);
@@ -50,7 +50,7 @@ struct VarDeclaration final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct BinaryExpression final : public ASTNode
+struct BinaryExpression final : ASTNode
 {
     ASTNode *left;
     ASTNode *right;
@@ -61,7 +61,7 @@ struct BinaryExpression final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct ParenthesizedExpression final : public ASTNode
+struct ParenthesizedExpression final : ASTNode
 {
     ASTNode *expression;
     explicit ParenthesizedExpression(ASTNode *expression);
@@ -69,7 +69,7 @@ struct ParenthesizedExpression final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct UnaryExpression final : public ASTNode
+struct UnaryExpression final : ASTNode
 {
     Token op;
     ASTNode *operand;
@@ -78,7 +78,7 @@ struct UnaryExpression final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct FunctionDeclaration final : public ASTNode
+struct FunctionDeclaration final : ASTNode
 {
     Token name;
     std::vector<ASTNode *> args;
@@ -88,7 +88,7 @@ struct FunctionDeclaration final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct FunctionCall final : public ASTNode
+struct FunctionCall final : ASTNode
 {
     ASTNode *name;
     std::vector<ASTNode *> args;
@@ -97,7 +97,7 @@ struct FunctionCall final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct ScopeBlock final : public ASTNode
+struct ScopeBlock final : ASTNode
 {
     std::vector<ASTNode *> statements;
     explicit ScopeBlock(std::vector<ASTNode *> statements);
@@ -105,7 +105,7 @@ struct ScopeBlock final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct IfStatement final : public ASTNode
+struct IfStatement final : ASTNode
 {
     ASTNode *condition;
     ASTNode *body;
@@ -116,7 +116,7 @@ struct IfStatement final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct WhileStatement final : public ASTNode
+struct WhileStatement final : ASTNode
 {
     ASTNode *condition;
     ASTNode *body;
@@ -125,7 +125,7 @@ struct WhileStatement final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct ArrayAccess final : public ASTNode
+struct ArrayAccess final : ASTNode
 {
     ASTNode *array;
     ASTNode *index;
@@ -134,7 +134,7 @@ struct ArrayAccess final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct FieldAccess final : public ASTNode
+struct FieldAccess final : ASTNode
 {
     ASTNode *record;
     ASTNode *field;
@@ -143,7 +143,7 @@ struct FieldAccess final : public ASTNode
     bool operator==(const ASTNode &other) const override;
 };
 
-struct Constructor final : public ASTNode
+struct Constructor final : ASTNode
 {
     ASTNode *record;
     explicit Constructor(ASTNode *record);

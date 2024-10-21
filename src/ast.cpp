@@ -29,23 +29,26 @@ void SingleNode::compile(OLRuntime::Program &program) const
 {
     switch (token.type) {
     case Token::Type::Number: {
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::LoadNumber,
             .data = {.number = {std::stod(token.value)}},
         });
-    } break;
+    }
+    break;
     case Token::Type::Identifier: {
         assert(program.local_vars.contains(token.value));
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::LoadLocal,
             .data = {.index = program.local_vars.at(token.value)},
         });
-    } break;
+    }
+    break;
     default:
         throw std::runtime_error("Unimplemented method!");
     }
 }
-
 bool SingleNode::operator==(const ASTNode &other) const
 {
     return type == other.type && token == dynamic_cast<const SingleNode &>(other).token;
@@ -61,7 +64,6 @@ void VarDeclaration::compile(OLRuntime::Program &program) const
     assert(!program.local_vars.contains(name.value));
     program.local_vars.insert({name.value, {program.local_vars.size()}});
 }
-
 bool VarDeclaration::operator==(const ASTNode &other) const
 {
     return type == other.type && name == dynamic_cast<const VarDeclaration &>(other).name;
@@ -69,8 +71,8 @@ bool VarDeclaration::operator==(const ASTNode &other) const
 
 BinaryExpression::BinaryExpression(ASTNode *left, ASTNode *right, Token op)
     : left(left)
-    , right(right)
-    , op(std::move(op))
+      , right(right)
+      , op(std::move(op))
 {
     type = Type::BinaryExpression;
     assert(left != nullptr && right != nullptr);
@@ -87,7 +89,8 @@ void BinaryExpression::compile(OLRuntime::Program &program) const
         left->compile(program);
         if (left->type == Type::VarDeclaration) {
             const auto name = dynamic_cast<VarDeclaration *>(left)->name.value;
-            program.instructions.push_back({
+            program.instructions.push_back(
+            {
                 .type = OLRuntime::Instruction::Type::StoreLocal,
                 .data = {.index = program.local_vars[name]},
             });
@@ -98,22 +101,26 @@ void BinaryExpression::compile(OLRuntime::Program &program) const
     right->compile(program);
     switch (op.type) {
     case Token::Type::Plus:
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::Add,
         });
         break;
     case Token::Type::Minus:
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::Sub,
         });
         break;
     case Token::Type::Asterisk:
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::Mul,
         });
         break;
     case Token::Type::Slash:
-        program.instructions.push_back({
+        program.instructions.push_back(
+        {
             .type = OLRuntime::Instruction::Type::Div,
         });
         break;
@@ -131,7 +138,7 @@ bool BinaryExpression::operator==(const ASTNode &other) const
 
 UnaryExpression::UnaryExpression(Token op, ASTNode *operand)
     : op(std::move(op))
-    , operand(operand)
+      , operand(operand)
 {
     type = Type::UnaryExpression;
     assert(operand != nullptr);
@@ -168,8 +175,8 @@ bool ParenthesizedExpression::operator==(const ASTNode &other) const
 
 FunctionDeclaration::FunctionDeclaration(Token name, std::vector<ASTNode *> args, ASTNode *body)
     : name(std::move(name))
-    , args(std::move(args))
-    , body(body)
+      , args(std::move(args))
+      , body(body)
 {
     type = Type::FunctionDeclaration;
     assert(body != nullptr);
@@ -208,14 +215,14 @@ bool ScopeBlock::operator==(const ASTNode &other) const
 
 IfStatement::IfStatement(ASTNode *condition, ASTNode *body, ASTNode *else_body)
     : condition(condition)
-    , body(body)
-    , else_body(else_body)
+      , body(body)
+      , else_body(else_body)
 {
     type = Type::IfStatement;
 }
 IfStatement::IfStatement(ASTNode *condition, ASTNode *body)
     : condition(condition)
-    , body(body)
+      , body(body)
 {
     type = Type::IfStatement;
 }
@@ -240,7 +247,7 @@ bool IfStatement::operator==(const ASTNode &other) const
 
 WhileStatement::WhileStatement(ASTNode *condition, ASTNode *body)
     : condition(condition)
-    , body(body)
+      , body(body)
 {
     type = Type::WhileStatement;
 }
@@ -259,7 +266,7 @@ bool WhileStatement::operator==(const ASTNode &other) const
 
 ArrayAccess::ArrayAccess(ASTNode *array, ASTNode *index)
     : array(array)
-    , index(index)
+      , index(index)
 {
     type = Type::ArrayAccess;
 }
@@ -278,7 +285,7 @@ bool ArrayAccess::operator==(const ASTNode &other) const
 
 FieldAccess::FieldAccess(ASTNode *record, ASTNode *field)
     : record(record)
-    , field(field)
+      , field(field)
 {
     type = Type::FieldAccess;
     assert(record != nullptr && field != nullptr);
@@ -298,14 +305,14 @@ bool FieldAccess::operator==(const ASTNode &other) const
 
 FunctionCall::FunctionCall(ASTNode *name, std::vector<ASTNode *> args)
     : name(name)
-    , args(std::move(args))
+      , args(std::move(args))
 {
     type = Type::FunctionCall;
 }
 FunctionCall::~FunctionCall()
 {
     delete name;
-    for (auto &arg : args)
+    for (const auto &arg : args)
         delete arg;
 }
 bool FunctionCall::operator==(const ASTNode &other) const
