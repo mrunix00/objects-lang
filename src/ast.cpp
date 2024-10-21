@@ -34,6 +34,13 @@ void SingleNode::compile(OLRuntime::Program &program) const
             .data = {.number = {std::stod(token.value)}},
         });
     } break;
+    case Token::Type::Identifier: {
+        assert(program.local_vars.contains(token.value));
+        program.instructions.push_back({
+            .type = OLRuntime::Instruction::Type::LoadLocal,
+            .data = {.index = program.local_vars.at(token.value)},
+        });
+    } break;
     default:
         throw std::runtime_error("Unimplemented method!");
     }
@@ -49,6 +56,12 @@ VarDeclaration::VarDeclaration(Token name)
 {
     type = Type::VarDeclaration;
 }
+void VarDeclaration::compile(OLRuntime::Program &program) const
+{
+    assert(!program.local_vars.contains(name.value));
+    program.local_vars.insert({name.value, {program.local_vars.size()}});
+}
+
 bool VarDeclaration::operator==(const ASTNode &other) const
 {
     return type == other.type && name == dynamic_cast<const VarDeclaration &>(other).name;
@@ -69,6 +82,18 @@ BinaryExpression::~BinaryExpression()
 }
 void BinaryExpression::compile(OLRuntime::Program &program) const
 {
+    if (op.type == Token::Type::Equals) {
+        right->compile(program);
+        left->compile(program);
+        if (left->type == Type::VarDeclaration) {
+            const auto name = dynamic_cast<VarDeclaration *>(left)->name.value;
+            program.instructions.push_back({
+                .type = OLRuntime::Instruction::Type::StoreLocal,
+                .data = {.index = program.local_vars[name]},
+            });
+        }
+        return;
+    }
     left->compile(program);
     right->compile(program);
     switch (op.type) {

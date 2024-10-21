@@ -9,37 +9,50 @@ void OLRuntime::OLRuntime::execute()
         case Instruction::Type::LoadNumber:
             stack.push_back(data.number);
             break;
+        case Instruction::Type::LoadLocal:
+            stack.push_back(local_vars.at(data.index));
+            break;
+        case Instruction::Type::StoreLocal:
+            if (data.index >= local_vars.size())
+                local_vars.resize(data.index + 1);
+            local_vars[data.index] = stack.back();
+            stack.pop_back();
+            break;
         case Instruction::Type::Add: {
             const auto x = stack.back();
             stack.pop_back();
             const auto y = stack.back();
             stack.pop_back();
             stack.push_back(x + y);
-        } break;
+        }
+        break;
         case Instruction::Type::Sub: {
             const auto x = stack.back();
             stack.pop_back();
             const auto y = stack.back();
             stack.pop_back();
             stack.push_back(y - x);
-        } break;
+        }
+        break;
         case Instruction::Type::Mul: {
             const auto x = stack.back();
             stack.pop_back();
             const auto y = stack.back();
             stack.pop_back();
             stack.push_back(x * y);
-        } break;
+        }
+        break;
         case Instruction::Type::Div: {
             const auto x = stack.back();
             stack.pop_back();
             const auto y = stack.back();
             stack.pop_back();
             stack.push_back(y / x);
-        } break;
+        }
+        break;
         case Instruction::Type::End:
             return;
-        default:;
+        default: ;
         }
     }
 }

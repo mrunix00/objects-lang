@@ -35,3 +35,12 @@ TEST(runtime_tests, divide_numbers)
     runtime.run("4 / 2");
     ASSERT_EQ(runtime.getLastValue(), 2.0);
 }
+
+TEST(runtime_tests, declare_variable)
+{
+    OLRuntime::OLRuntime runtime;
+    runtime.run(
+        "var x = 10\n"
+        "x");
+    ASSERT_EQ(runtime.getLastValue(), 10.0);
+}

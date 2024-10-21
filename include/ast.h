@@ -46,6 +46,7 @@ struct VarDeclaration final : public ASTNode
 {
     Token name;
     explicit VarDeclaration(Token name);
+    void compile(OLRuntime::Program &program) const override;
     bool operator==(const ASTNode &other) const override;
 };
 

@@ -318,7 +318,8 @@ std::vector<ASTNode *> parse(const std::string &source)
     std::vector<ASTNode *> nodes;
 
     while (lexer.peek().type != Token::Type::EndOfFile) {
-        nodes.push_back(read_expression(lexer, nodes));
+        if (const auto expression = read_expression(lexer, nodes); expression != nullptr)
+            nodes.push_back(expression);
     }
 
     return nodes;
